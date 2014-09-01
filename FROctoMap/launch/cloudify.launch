@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<launch>
+  
+  <!-- Static Transform -->
+   <node pkg="tf" type="static_transform_publisher" name="base_link_to_depth" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 /base_link /depth_optical_frame 100" />
+   <node pkg="tf" type="static_transform_publisher" name="base_link_to_odom" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 /base_link /odom 100" />
+   
+
+  <!-- Nodelet manager for this pipeline -->
+  <node pkg="nodelet" type="nodelet" args="manager" name="record_player_manager" output="screen"/>
+  
+  <!-- The depth image is already rectified and registered to the camera optical frame, but stored in mm; convert it to meters -->
+  <node pkg="nodelet" type="nodelet" name="metric_rect"  args="load depth_image_proc/convert_metric record_player_manager --no-bond">
+    <remap from="image_raw" to="/camera/depth/image_raw"/>
+    <remap from="image" to="/camera/depth/image_rect"/>
+  </node>
+  
+  <!-- Convert it into a point cloud -->
+  <node pkg="nodelet" type="nodelet" name="cloudify" output="screen" args="load depth_image_proc/point_cloud_xyz record_player_manager --no-bond">
+    <remap from="image_rect" to="/camera/depth/image_rect"/>
+    <remap from="points" to="/camera/depth_registered/points2"/>
+    <remap from="camera_info" to="/camera/depth/camera_info"/>
+  </node>
+  
+  <node pkg="octomap_server" type="octomap_server_node" name="octomap_server" output="screen">
+    <param name="resolution" value="0.05" />
+    <!-- fixed map frame (set to 'map' if SLAM or localization running!) -->
+    <param name="frame_id" type="string" value="odom" />
+    <!-- maximum range to integrate (speedup!) -->
+    <param name="sensor_model/max_range" value="5.0" />
+    <!-- data source to integrate (PointCloud2) -->
+    <remap from="cloud_in" to="/camera/depth_registered/points2" />
+
+  </node>
+
+  
+</launch>

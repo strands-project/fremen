@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<package>
+  <name>fremen</name>
+  <version>0.0.0</version>
+  <description>Frequency Map Enhancement</description>
+
+  Frequency Map Enhancement is an idea that allows to introduce dynamics into spatial models used in the mobile robotics domain.
+Many of these spatial models describe the enviroment by a set of discrete components with binary states.
+For example, cells of an occupancy grid are occupied or free, edges of a topological map are traversable or not, doors are opened or closed, rooms are vacant or occupied, landmarks are visible or occluded, etc.
+Typically, the state of each model component is uncertain, because it is measured indirectly by means of sensors which are affected by noise.
+
+The idea assumes that in populated evironments, many of the observed changes are caused by humans performing their daily activities. 
+Therefore, the environment's dynamics can be modeled by its frequency spectrum, as a combination of harmonic functions that correspond to periodic processes influencing the environment. 
+Such a representation not only allows representation of environment dynamics over arbitrary timescales with constant memory requirements, but also prediction of future environment states. 
+The proposed approach can be applied to many of the state-of-the-art environment models. 
+
+Models like occupancy grids, topological or landmark maps can be easily extended by FreMEn.
+We present experiments using data collected by a mobile robot patrolling an indoor environment over a period of one month, where frequency-enhanced models were compared to their static counterparts in four scenarios: i) 3D map building, ii) environment state prediction, iii) topological localisation and iv) anomaly detection, in order to verify the model's ability to detect unusual events. In all these cases, the frequency-enhanced models outperformed their static counterparts.
+
+
+  <!-- One maintainer tag required, multiple allowed, one person per tag --> 
+  <!-- Example:  -->
+  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
+  <maintainer email="tomkrajnik@hotmail.com">gestom</maintainer>
+
+
+  <!-- One license tag required, multiple allowed, one license per tag -->
+  <!-- Commonly used license strings: -->
+  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
+  <license>MIT</license>
+
+
+  <!-- Url tags are optional, but mutiple are allowed, one per tag -->
+  <!-- Optional attribute type can be: website, bugtracker, or repository -->
+  <!-- Example: -->
+  <!-- <url type="website">http://wiki.ros.org/FreMen</url> -->
+
+
+  <!-- Author tags are optional, mutiple are allowed, one per tag -->
+  <!-- Authors do not have to be maintianers, but could be -->
+  <!-- Example: -->
+  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+
+
+  <!-- The *_depend tags are used to specify dependencies -->
+  <!-- Dependencies can be catkin packages or system dependencies -->
+  <!-- Examples: -->
+  <!-- Use build_depend for packages you need at compile time: -->
+  <!--   <build_depend>message_generation</build_depend> -->
+  <!-- Use buildtool_depend for build tool packages: -->
+  <!--   <buildtool_depend>catkin</buildtool_depend> -->
+  <!-- Use run_depend for packages you need at runtime: -->
+  <!--   <run_depend>message_runtime</run_depend> -->
+  <!-- Use test_depend for packages you need only for testing: -->
+  <!--   <test_depend>gtest</test_depend> -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>pcl_conversions</build_depend>
+  <build_depend>pcl_ros</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+	<build_depend>octomap</build_depend>
+	<build_depend>message_generation</build_depend>
+	<build_depend>genmsg</build_depend>
+	<build_depend>message_runtime</build_depend>
+	<run_depend>pcl_conversions</run_depend>
+	<run_depend>pcl_run</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+	<run_depend>visualization_msgs</run_depend>
+	<run_depend>octomap</run_depend>
+	<run_depend>message_runtime</run_depend>
+	<run_depend>genmsg</run_depend>
+	<run_depend>sensor_msgs</run_depend>
+  <run_depend>pcl_conversions</run_depend>
+  <run_depend>pcl_ros</run_depend>
+<build_depend>libpcl-all-dev</build_depend>
+  <run_depend>libpcl-all</run_depend>
+
+<build_depend>actionlib</build_depend>
+<build_depend>actionlib_msgs</build_depend>
+<run_depend>actionlib</run_depend>
+<run_depend>actionlib_msgs</run_depend>
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- You can specify that this package is a metapackage here: -->
+    <!-- <metapackage/> -->
+
+    <!-- Other tools can request additional information be placed here -->
+
+  </export>
+</package>

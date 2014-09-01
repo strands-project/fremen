@@ -1,0 +1,4 @@
+string mapname 
+float64 stamp
+---
+bool result

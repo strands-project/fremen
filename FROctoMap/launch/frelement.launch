@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch>
+  
+  <node pkg="fremen" type="frelement_octo" name="frelement_octo" output="screen">
+    <param name="modelOrder" value="0" />
+    <param name="resolution" value="0.05" />
+    <param name="colorFactor" value="0.8" />
+    <param name="filename" value="/home/joao/catkin_ws/1day_data" />
+  </node>
+  
+</launch>
