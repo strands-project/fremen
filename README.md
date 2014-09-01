@@ -14,4 +14,4 @@ Such a representation not only allows representation of environment dynamics ove
 The proposed approach can be applied to many of the state-of-the-art environment models.
 
 Models like occupancy grids, topological or landmark maps can be easily extended by FreMEn.
-For reference, see our IROS 2014 and ICRA 2014 papers.
+For reference, see our IROS 2014, TAROS 2014 and ICRA 2014 papers.
