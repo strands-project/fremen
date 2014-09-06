@@ -16,7 +16,7 @@ The proposed approach can be applied to many of the state-of-the-art environment
 
 In particular, we have shown that occupancy grids, topological or landmark maps can be easily extended by FreMEn.
 - We have shown that the FreMEn allows to represent millions of observations by a few spectral parameters, can reliably predict environment states and detect anomalies [1].
-- Applying FreMEn to visibility of visual features improves mobile robot localization in changing environments [2].
+- Applying FreMEn to visibility of visual features improves mobile robot localization in [changing environments](https://www.youtube.com/watch?v=8AwQrtuNwuA&list=UUJxXV1gKZsmoeoUKE4xo0kA) [2].
 - Combining FreMEn with Octomaps results in an efficient spatio-temporal environment model called FrOctoMAp [3] that achieves compression rates up to 1:100000 for timescales over three months.
 
 ======
