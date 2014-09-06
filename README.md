@@ -19,8 +19,8 @@ In particular, we have shown that occupancy grids, topological or landmark maps 
 - Applying FreMEn to visibility of visual features improves mobile robot localization in changing environments [2].
 - Combining FreMEn with Octomaps results in an efficient spatio-temporal environment model called FrOctoMAp [3] that achieves compression rates up to 1:100000 for timescales over three months.
 
-
+======
 1. T.Krajnik, J.P.Fentanes, G.Cielniak, C.Dondrup, T.Duckett: <b>[Spectral Analysis for Long-Term Robotic Mapping.](http://labe.felk.cvut.cz/~tkrajnik/papers/fremen_2014_ICRA.pdf)</b> ICRA 2014.
-2. T.Krajnik, J.P.Fentanes, O.M.Mozos, T.Duckett, J.Ekekrantz, M.Hanheide: <b>[Long-term topological localisation for service robots in dynamic environments using spectral maps.]()</b> IROS 2014.
-3. T.Krajnik, J.M.Santos, B.Seemann, T.Duckett: <b>[FROctomap: An Efficient Spatio-Temporal Environment Representation.]()</b> TAROS 2014.
+2. T.Krajnik, J.P.Fentanes, O.M.Mozos, T.Duckett, J.Ekekrantz, M.Hanheide: <b>[Long-term topological localisation for service robots in dynamic environments using spectral maps.](http://labe.felk.cvut.cz/~tkrajnik/papers/fremen_2014_IROS.pdf)</b> IROS 2014.
+3. T.Krajnik, J.M.Santos, B.Seemann, T.Duckett: <b>[FROctomap: An Efficient Spatio-Temporal Environment Representation.](http://labe.felk.cvut.cz/~tkrajnik/papers/fremen_2014_TAROS.pdf)</b> TAROS 2014.
 
