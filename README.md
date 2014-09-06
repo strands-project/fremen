@@ -15,12 +15,12 @@ Such a model not only allows representation of environment dynamics over arbitra
 The proposed approach can be applied to many of the state-of-the-art environment models.
 
 In particular, we have shown that occupancy grids, topological or landmark maps can be easily extended by FreMEn.
--We have shown that the FreMEn allows to represent millions of observations by a few spectral parameters, can reliably predict environment states and detect anomalies [1].
--Applying FreMEn to visibility of visual features improves mobile robot localization in changing environments [2].
--Combining FreMEn with Octomaps results in an efficient spatio-temporal environment model called FrOctoMAp [3] that achieves compression rates up to 1:100000 for timescales over three months.
+- We have shown that the FreMEn allows to represent millions of observations by a few spectral parameters, can reliably predict environment states and detect anomalies [1].
+- Applying FreMEn to visibility of visual features improves mobile robot localization in changing environments [2].
+- Combining FreMEn with Octomaps results in an efficient spatio-temporal environment model called FrOctoMAp [3] that achieves compression rates up to 1:100000 for timescales over three months.
 
 
--[1] T.Krajnik, J.P.Fentanes, G.Cielniak, C.Dondrup, T.Duckett: <b>[Spectral Analysis for Long-Term Robotic Mapping.](http://labe.felk.cvut.cz/~tkrajnik/papers/fremen_2014_ICRA.pdf)</b> ICRA 2014.
--[2] T.Krajnik, J.P.Fentanes, O.M.Mozos, T.Duckett, J.Ekekrantz, M.Hanheide: <b>[Long-term topological localisation for service robots in dynamic environments using spectral maps.]()</b> IROS 2014.
--[3] T.Krajnik, J.M.Santos, B.Seemann, T.Duckett: <b>[FROctomap: An Efficient Spatio-Temporal Environment Representation.]()</b> TAROS 2014.
+1. T.Krajnik, J.P.Fentanes, G.Cielniak, C.Dondrup, T.Duckett: <b>[Spectral Analysis for Long-Term Robotic Mapping.](http://labe.felk.cvut.cz/~tkrajnik/papers/fremen_2014_ICRA.pdf)</b> ICRA 2014.
+2. T.Krajnik, J.P.Fentanes, O.M.Mozos, T.Duckett, J.Ekekrantz, M.Hanheide: <b>[Long-term topological localisation for service robots in dynamic environments using spectral maps.]()</b> IROS 2014.
+3. T.Krajnik, J.M.Santos, B.Seemann, T.Duckett: <b>[FROctomap: An Efficient Spatio-Temporal Environment Representation.]()</b> TAROS 2014.
 
