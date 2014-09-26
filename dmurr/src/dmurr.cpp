@@ -62,7 +62,7 @@ void retrieveData(const char* mapName)
 				edgeArray[numEdges] = new CEdgeStatistics(edgename);
 				index = numEdges++;
 			}
-			edgeArray[index]->addMeasurement(p->date_started.c_str(),p->status.c_str(),p->time_to_waypoint);
+			edgeArray[index]->addMeasurement(p->date_started.c_str(),p->status.c_str(),p->operation_time);
 		}
 	}
 	if (debug) printf("\n");
@@ -220,7 +220,7 @@ void actionServerCallback(const dmurr::TopologicalPredictionGoalConstPtr& goal, 
 		if (debug) printEdges("all");
 		feedback.status = "Building edge FreMEn models.";
 		server->publishFeedback(feedback);
-		for (int i = 0;i<numEdges;i++) edgeArray[i]->buildModel(goal->resultOrder,goal->durationOrder);
+		for (int i = 0;i<numEdges;i++)edgeArray[i]->buildModel(goal->resultOrder,goal->durationOrder);
 		evaluateModels();
 		feedback.status = "FREMEN model build and evaluated.";
 		server->publishFeedback(feedback);
