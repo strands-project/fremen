@@ -1,0 +1,8 @@
+string mapname
+int32 maxOrder
+---
+int32 size
+float32[] allErrors 
+float32[] nonemptyErrors 
+float32[] dynamicErrors 
+bool result

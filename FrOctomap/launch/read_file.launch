@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<launch>
+  <node pkg="fremen" type="publish_data" name="publish_data"  output="screen">
+    <param name="directory" value="/home/gestom/data/datasety/strands/greg/test/" />
+    <param name="filename" value="2014-06-04_23:59:56.3D" />
+  </node>
+</launch>
