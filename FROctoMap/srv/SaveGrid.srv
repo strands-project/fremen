@@ -1,7 +1,0 @@
-string mapname 
-string filename
-int64 order
-bool lossy
----
-int64 size
-bool result

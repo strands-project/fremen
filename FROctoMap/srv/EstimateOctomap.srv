@@ -1,7 +1,0 @@
-string mapname 
-float64 stamp
-float64 minProbability 
-float64 maxProbability 
-int8 morphology 
----
-bool result

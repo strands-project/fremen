@@ -1,6 +1,5 @@
 FreMEn
 ======
-
 Frequency Map Enhancement (FreMEn) is a method that allows to introduce dynamics into spatial models used in the mobile robotics domain.
 Many of these models describe the environment by a set of discrete components with binary states.
 For example, cells of an occupancy grid are occupied or free, edges of a topological map are traversable or not, doors are opened or closed, rooms are vacant or occupied, landmarks are visible or occluded, etc.
