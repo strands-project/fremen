@@ -1,0 +1,22 @@
+# Define the goal
+string name_action 	# update save predict recover_octomap estimate_octomap
+string mapname
+float64 stamp		# measurement time
+int64 order		# 0 - 100
+float64 precision	# 0.0 - 1.0
+bool lossy
+float64 minprobability  # 0.0 - 1.0
+float64 maxprobability	# 0.0 - 1.0
+int8 morphology 
+string filename	
+---
+# Define the result
+bool sucessfull
+---
+# Define a feedback message
+
+# update 0 0 0 0 0 0 0 
+# recover 1 0 0 0 0 0 0
+# estimate 1 0 0 0 0.0 1.1 0
+# estimate 1 0 0 0 0.0 1.0 0
+

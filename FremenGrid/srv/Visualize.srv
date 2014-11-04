@@ -1,0 +1,11 @@
+float64 stamp
+float32 minProbability
+float32 maxProbability
+float32 red
+float32 green 
+float32 blue 
+float32 alpha 
+int32 type 
+string name
+---
+int32 number

@@ -1,0 +1,10 @@
+string mapname
+int32 order
+float32 precision
+bool lossy
+---
+float32 allError 
+float32 nonemptyError 
+float32 dynamicError 
+int64 size
+bool result
