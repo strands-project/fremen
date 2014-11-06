@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(frenap)
 
 
-find_package(catkin REQUIRED COMPONENTS  mongodb_store roscpp genmsg actionlib_msgs actionlib) 
+find_package(catkin REQUIRED COMPONENTS  mongodb_store roscpp genmsg actionlib_msgs actionlib strands_navigation_msgs) 
 
 set ( CMAKE_CXX_FLAGS "-Ofast -march=native -mno-avx -ggdb")
 
@@ -15,6 +15,7 @@ generate_messages(
    DEPENDENCIES actionlib_msgs 
 )
 
+#add_dependencies(frenap ${catkin_EXPORTED_TARGETS})
 catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs)
 
 include_directories(${catkin_INCLUDE_DIRS}) 

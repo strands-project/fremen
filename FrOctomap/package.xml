@@ -51,20 +51,24 @@
   <build_depend>rospy</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_msgs</build_depend>
-	<build_depend>octomap</build_depend>
-	<build_depend>message_generation</build_depend>
-	<build_depend>genmsg</build_depend>
-	<build_depend>message_runtime</build_depend>
-	<run_depend>pcl_conversions</run_depend>
-	<run_depend>pcl_ros</run_depend>
+  <build_depend>octomap</build_depend>
+  <build_depend>octomap_server</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>genmsg</build_depend>
+  <build_depend>message_runtime</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+
+  <run_depend>octomap_server</run_depend>
+  <run_depend>pcl_conversions</run_depend>
+  <run_depend>pcl_ros</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>std_msgs</run_depend>
-	<run_depend>visualization_msgs</run_depend>
-	<run_depend>octomap</run_depend>
-	<run_depend>message_runtime</run_depend>
-	<run_depend>genmsg</run_depend>
-	<run_depend>sensor_msgs</run_depend>
+  <run_depend>visualization_msgs</run_depend>
+  <run_depend>octomap</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>genmsg</run_depend>
+  <run_depend>sensor_msgs</run_depend>
   <run_depend>pcl_conversions</run_depend>
   <run_depend>pcl_ros</run_depend>
 <build_depend>libpcl-all-dev</build_depend>
