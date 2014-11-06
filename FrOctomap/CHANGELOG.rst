@@ -2,6 +2,9 @@
 Changelog for package froctomap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.0.1 (2014-11-04)
 ------------------
 * Fremen cleanup and release prep
