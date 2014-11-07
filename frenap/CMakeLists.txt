@@ -22,7 +22,7 @@ include_directories(${catkin_INCLUDE_DIRS} include)
 add_executable(frenap src/frenap.cpp)
 add_executable(frenap-standalone src/frenap-standalone.cpp)
 
-add_dependencies(frenap ${catkin_EXPORTED_TARGETS} mongodb_store topological_navigation_generate_messages_cpp frenap_msgs)
+add_dependencies(frenap ${catkin_EXPORTED_TARGETS} mongodb_store actionlib_msgs frenap_msgs)
 
 add_library(frenap_frelement src/CFrelement.cpp)
 add_library(frenap_edge_statistics src/CEdgeStatistics.cpp)
