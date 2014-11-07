@@ -15,15 +15,14 @@ generate_messages(
    DEPENDENCIES actionlib_msgs 
 )
 
-#add_dependencies(frenap ${catkin_EXPORTED_TARGETS})
 catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs)
 
-include_directories(${catkin_INCLUDE_DIRS}) 
+include_directories(${catkin_INCLUDE_DIRS} include) 
 
 add_executable(frenap src/frenap.cpp)
 add_executable(frenap-standalone src/frenap-standalone.cpp)
 
-add_dependencies(frenap ${catkin_EXPORTED_TARGETS} mongodb_store topological_navigation_generate_messages_cpp actionlib_generate_messages_cpp)
+add_dependencies(frenap ${catkin_EXPORTED_TARGETS} mongodb_store topological_navigation_generate_messages_cpp frenap_msgs)
 
 add_library(frenap_frelement src/CFrelement.cpp)
 add_library(frenap_edge_statistics src/CEdgeStatistics.cpp)
@@ -37,3 +36,34 @@ target_link_libraries (frenap
 		${catkin_LIBRARIES}
 		frenap_frelement
 )
+
+
+#############
+## Install ##
+#############
+# all install targets should use catkin DESTINATION variables
+# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
+## Mark executable scripts (Python etc.) for installation
+## in contrast to setup.py, you can choose the destination
+#install(DIRECTORY scripts/
+#DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#USE_SOURCE_PERMISSIONS
+#)
+
+# Mark other files for installation (e.g. launch and bag files, etc.)
+#install(
+#DIRECTORY launch
+#DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+#)
+
+# Mark cpp header files for installation
+install(DIRECTORY include/
+DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+)
+
+## Mark executables and/or libraries for installation
+install(TARGETS frenap frenap-standalone frenap_edge_statistics frenap_timer frenap_frelement
+		ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+		LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+		RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+       )
