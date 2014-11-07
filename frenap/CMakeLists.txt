@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(frenap)
 
 
-find_package(catkin REQUIRED COMPONENTS  mongodb_store roscpp genmsg actionlib_msgs actionlib strands_navigation_msgs) 
+find_package(catkin REQUIRED COMPONENTS  mongodb_store roscpp genmsg actionlib_msgs actionlib strands_navigation_msgs std_msgs) 
 
 set ( CMAKE_CXX_FLAGS "-Ofast -march=native -mno-avx -ggdb")
 
@@ -11,9 +11,7 @@ add_action_files(
   FILES TopologicalPrediction.action
 )
 
-generate_messages(
-   DEPENDENCIES actionlib_msgs 
-)
+generate_messages(DEPENDENCIES actionlib_msgs std_msgs)
 
 catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs)
 
