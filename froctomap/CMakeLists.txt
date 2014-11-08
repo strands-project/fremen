@@ -6,8 +6,12 @@ find_package(catkin REQUIRED COMPONENTS  pcl_conversions pcl_ros roscpp rospy st
 #set ( CMAKE_CXX_FLAGS "-O3 -march=native")
 set ( CMAKE_CXX_FLAGS "-ggdb")
 
+
+
 include_directories(${OCTOMAP_INCLUDE_DIRS}) 
 link_libraries( ${OCTOMAP_LIBRARIES}) 
+include_directories(${FFTW_INCLUDE_DIRS}) 
+link_libraries(${FFTW_LIBRARIES}) 
 
 add_action_files(DIRECTORY action FILES froctomap.action)
 
@@ -21,16 +25,16 @@ add_service_files(
 		Update.srv
 )
 
+include_directories(${catkin_INCLUDE_DIRS} include) 
+
 generate_messages(
 	DEPENDENCIES
 	std_msgs 
 	actionlib_msgs
 )
 
-catkin_package(CATKIN_DEPENDS roscpp message_runtime pcl_conversions pcl_ros std_msgs genmsg actionlib_msgs)
-
-include_directories(${catkin_INCLUDE_DIRS} include) 
-
+#catkin_package(CATKIN_DEPENDS roscpp message_runtime pcl_conversions pcl_ros std_msgs genmsg actionlib_msgs)
+catkin_package()
 
 add_executable(froctomap src/froctomap.cpp)
 add_executable(convert_raw src/convert_raw.cpp)
