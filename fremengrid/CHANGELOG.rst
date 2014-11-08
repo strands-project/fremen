@@ -2,8 +2,8 @@
 Changelog for package fremengrid
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.0 (2014-11-08)
+------------------
 * Packages improved.
 * Contributors: Tom Krajnik
 

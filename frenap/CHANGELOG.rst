@@ -2,8 +2,8 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.0 (2014-11-08)
+------------------
 * Actionlib generate messages
 * Packages improved.
 * Contributors: Tom Krajnik
