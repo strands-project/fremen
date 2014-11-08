@@ -9,13 +9,13 @@ Thus, the probability of a particular component being in a particular state rema
 
 Frequency Map Enhancement considers the probability of each environment state as a function of time and represents it by a combination of harmonic components.
 The idea assumes that in populated environments, many of the observed changes are caused by humans performing their daily activities.
-Therefore, the environment's dynamics is naturally periodic and can be modeled by its frequency spectrum that represent a combination of harmonic functions that correspond to periodic processes influencing the environment.
+Therefore, the environment's dynamics is naturally periodic and can be modelled by its frequency spectrum that represent a combination of harmonic functions that correspond to periodic processes influencing the environment.
 Such a model not only allows representation of environment dynamics over arbitrary timescales with constant memory requirements, but also prediction of future environment states.
 The proposed approach can be applied to many of the state-of-the-art environment models.
 
 In particular, we have shown that occupancy grids, topological or landmark maps can be easily extended by FreMEn.
 - We have shown that the FreMEn allows to represent millions of observations by a few spectral parameters, can reliably predict environment states and detect anomalies [1].
-- Applying FreMEn to visibility of visual features improves mobile robot localization in [changing environments](https://www.youtube.com/watch?v=8AwQrtuNwuA&list=UUJxXV1gKZsmoeoUKE4xo0kA) [2].
+- Applying FreMEn to visibility of visual features improves mobile robot localisation in [changing environments](https://www.youtube.com/watch?v=8AwQrtuNwuA&list=UUJxXV1gKZsmoeoUKE4xo0kA) [2].
 - Combining FreMEn with Octomaps results in an efficient spatio-temporal environment model called FrOctoMAp [3] that achieves compression rates up to 1:100000 for timescales over three months.
 
 ======
