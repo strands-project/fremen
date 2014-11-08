@@ -11,16 +11,17 @@ add_action_files(
   FILES TopologicalPrediction.action
 )
 
-generate_messages(DEPENDENCIES actionlib_msgs std_msgs)
+generate_messages(DEPENDENCIES std_msgs actionlib_msgs)
 
-catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs)
+#catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs)
+catkin_package()
 
 include_directories(${catkin_INCLUDE_DIRS} include) 
 
 add_executable(frenap src/frenap.cpp)
 add_executable(frenap-standalone src/frenap-standalone.cpp)
 
-add_dependencies(frenap ${catkin_EXPORTED_TARGETS} mongodb_store actionlib_msgs frenap_msgs_gencpp frenap_msgs)
+add_dependencies(frenap ${catkin_EXPORTED_TARGETS} mongodb_store ${PROJECT_NAME}_generate_messages_cpp)
 
 add_library(frenap_frelement src/CFrelement.cpp)
 add_library(frenap_edge_statistics src/CEdgeStatistics.cpp)
@@ -34,7 +35,6 @@ target_link_libraries (frenap
 		${catkin_LIBRARIES}
 		frenap_frelement
 )
-
 
 #############
 ## Install ##
