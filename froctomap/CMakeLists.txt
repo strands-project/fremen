@@ -10,8 +10,8 @@ set ( CMAKE_CXX_FLAGS "-ggdb")
 
 include_directories(${OCTOMAP_INCLUDE_DIRS}) 
 link_libraries( ${OCTOMAP_LIBRARIES}) 
-include_directories(${FFTW_INCLUDE_DIRS}) 
-link_libraries(${FFTW_LIBRARIES}) 
+#include_directories(${FFTW_INCLUDE_DIRS}) 
+#link_libraries(${FFTW_LIBRARIES}) 
 
 add_action_files(DIRECTORY action FILES froctomap.action)
 
@@ -40,7 +40,7 @@ add_executable(froctomap src/froctomap.cpp)
 add_executable(convert_raw src/convert_raw.cpp)
 add_executable(froctomap_util src/froctomap_util.cpp)
 
-add_dependencies(froctomap ${catkin_EXPORTED_TARGETS} froctomap_msgs)
+add_dependencies(froctomap ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
 
 add_library(froctomap_element src/CFrelement.cpp)
 add_library(froctomap_timer src/CTimer.cpp)
