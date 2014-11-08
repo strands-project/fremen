@@ -11,7 +11,11 @@ add_action_files(
   FILES TopologicalPrediction.action
 )
 
-generate_messages(DEPENDENCIES std_msgs actionlib_msgs)
+generate_messages(
+		DEPENDENCIES 
+		std_msgs 
+		actionlib_msgs
+		)
 
 #catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs)
 catkin_package()
@@ -30,11 +34,7 @@ add_library(frenap_timer src/CTimer.cpp)
 target_link_libraries(frenap_frelement frenap_timer)
 target_link_libraries(frenap frenap_edge_statistics)
 target_link_libraries(frenap-standalone frenap_frelement)
-
-target_link_libraries (frenap
-		${catkin_LIBRARIES}
-		frenap_frelement
-)
+target_link_libraries(frenap ${catkin_LIBRARIES} frenap_frelement)
 
 #############
 ## Install ##

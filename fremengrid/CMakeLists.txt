@@ -25,6 +25,7 @@ add_executable(fremengrid src/fremenGrid.cpp)
 add_executable(exploration src/fremenExploration.cpp)
 
 add_dependencies(fremengrid ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(exploration ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
 
 #catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs)
 catkin_package()
