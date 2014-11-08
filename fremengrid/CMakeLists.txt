@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(fremengrid)
 
 
-find_package(catkin REQUIRED COMPONENTS  roscpp rospy std_msgs visualization_msgs geometry_msgs genmsg sensor_msgs image_transport actionlib actionlib_msgs tf)
+find_package(catkin REQUIRED COMPONENTS  roscpp rospy std_msgs visualization_msgs geometry_msgs genmsg sensor_msgs image_transport actionlib actionlib_msgs tf  move_base_msgs)
 set ( CMAKE_CXX_FLAGS "-Ofast -march=native -mno-avx -ggdb")
 
 add_service_files(
@@ -15,16 +15,20 @@ add_service_files(
 
 generate_messages(
 	DEPENDENCIES
-	std_msgs actionlib_msgs
+	std_msgs 
+	actionlib_msgs
 )
+
+include_directories(${catkin_INCLUDE_DIRS} include) 
 
 add_executable(fremengrid src/fremenGrid.cpp)
 add_executable(exploration src/fremenExploration.cpp)
 
-add_dependencies(fremengrid ${catkin_EXPORTED_TARGETS} fremengrid_msgs)
-catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs)
+add_dependencies(fremengrid ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
 
-include_directories(${catkin_INCLUDE_DIRS} include) 
+#catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs)
+catkin_package()
+
 
 add_library(frelement src/CFrelement.cpp)
 add_library(fremen_timer src/CTimer.cpp)
