@@ -64,17 +64,15 @@ The server performs predictions for the given *times* and *orders*, compares tho
 - **message** contains a detailed report or an error message.
 - **errors** is an array of prediction errors for model orders from 0 to **order**.
 
-###The **update** action 
 
-Reserved for future use when FreMEn is fused with Gaussian Mixture Models.
-
-###The **delete** action 
-
-Deletes a state with a given *id* from the state collection held in the server.
-
-####input:
+###The 'delete' action 
+Deletes a state with a given **id** from the state collection held in the server.
+####Inputs
 - **id** identification of the state that is concerned. If the **id** did not exist, an error is reported.
-
-####output:
+####Output
 - **success** contains the number of states in the collection before the action was called. 
 - **message** contains a detailed report or an error message.
+
+###The 'update' action 
+
+Reserved for future use when FreMEn is fused with Gaussian Mixture Models.
