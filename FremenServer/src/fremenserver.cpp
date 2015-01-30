@@ -35,11 +35,10 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 		server->setAborted(result);
 		return;
 	}
-
-	if (debug) ROS_DEBUG("Command received %s %s\n",goal->action.c_str(),goal->id.c_str());
+	if (debug) ROS_DEBUG("Command received %s %s\n",goal->operation.c_str(),goal->id.c_str());
 
 	/*perform model update (if needed)*/
-	if (goal->action == "update")
+	if (goal->operation == "update")
 	{
 		if (frelements.update(goal->id.c_str(),goal->order)>=0){
 			result.message = "Fremen model updated";
@@ -51,20 +50,49 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			server->setAborted(result);
 		}
 	}
-	else if (goal->action == "add")
+	else if (goal->operation == "add")
 	{
-		result.success = frelements.add(goal->id.c_str(),(uint32_t*)goal->times.data(),(unsigned char*)goal->states.data(),(int)goal->states.size());
-		if (result.success >=0)
-		{
-			mess << "Added " << result.success << " of the " << (int)goal->states.size() << " provided measurements to the state " << goal->id;
-    			result.message = mess.str(); 
+		if (goal->times.size() == goal->states.size()){
+			result.success = frelements.add(goal->id.c_str(),(uint32_t*)goal->times.data(),(unsigned char*)goal->states.data(),(int)goal->states.size());
+			if (result.success >=0)
+			{
+				mess << "Added " << result.success << " of the " << (int)goal->states.size() << " provided measurements to the state " << goal->id;
+				result.message = mess.str(); 
+			}else{
+				mess << "A new state " <<  goal->id << " was added to the collection and filled with "  << (int)goal->states.size() << " measurements.";
+				result.message = mess.str(); 
+			}
+			server->setSucceeded(result);
 		}else{
-			mess << "A new state " <<  goal->id << " was added to the collection and filled with "  << (int)goal->states.size() << " measurements.";
-    			result.message = mess.str(); 
+			mess << "The length of the 'states' and 'times' arrays does not match.";
+			result.message = mess.str(); 
+			result.success = -2;
+			server->setAborted(result);
 		}
-		server->setSucceeded(result);
 	}	
-	else if (goal->action == "predict")
+	else if (goal->operation == "evaluate")
+	{
+		if (goal->times.size() == goal->states.size()){
+			float evaluations[goal->order+1];
+			result.success = frelements.evaluate(goal->id.c_str(),(uint32_t*)goal->times.data(),(unsigned char*)goal->states.data(),(int)goal->times.size(),goal->order,evaluations);
+			if (result.success >= 0)
+			{
+				mess << "Performed " <<  (goal->order+1) << " evaluations of the model "  << goal->id << " using " << (int)goal->times.size() << " ground truth values. The best performing model has order " << result.success;
+				result.message = mess.str();
+				result.errors.assign(evaluations,evaluations + goal->order+1);
+				server->setSucceeded(result);
+			}else{
+				mess << "State ID " << goal->id << " does not exist.";
+				result.message = mess.str();
+				server->setAborted(result);
+			}
+		}else{
+			mess << "The length of the 'states' and 'times' arrays does not match.";
+			result.success = -2;
+			server->setAborted(result);
+		}
+	}
+	else if (goal->operation == "predict")
 	{
 		float probs[goal->times.size()];
 		result.success = frelements.estimate(goal->id.c_str(),(uint32_t*)goal->times.data(),probs,(int)goal->times.size(),goal->order);
@@ -80,15 +108,15 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			server->setAborted(result);
 		}
 	}
-	else if (goal->action == "evaluate")
+	else if (goal->operation == "entropy")
 	{
-		float evaluations[goal->order+1];
-		result.success = frelements.evaluate(goal->id.c_str(),(uint32_t*)goal->times.data(),(unsigned char*)goal->states.data(),(int)goal->times.size(),goal->order,evaluations);
-		if (result.success >= 0)
+		float probs[goal->times.size()];
+		result.success = frelements.estimateEntropy(goal->id.c_str(),(uint32_t*)goal->times.data(),probs,(int)goal->times.size(),goal->order);
+		if (result.success >=0)
 		{
-			mess << "Performed " <<  (goal->order+1) << " evaluations of the model "  << goal->id << " using " << (int)goal->times.size() << " ground truth values. The best performing model has order " << result.success;
+			mess << "Performed " << (int)goal->times.size() << " entropy estimations of the state " << goal->id;
+			result.entropies.assign(probs,probs + (int)goal->times.size());
 			result.message = mess.str();
-			result.errors.assign(evaluations,evaluations + goal->order+1);
 			server->setSucceeded(result);
 		}else{
 			mess << "State ID " << goal->id << " does not exist.";
@@ -96,7 +124,7 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			server->setAborted(result);
 		}
 	}
-	else if (goal->action == "remove")
+	else if (goal->operation == "remove")
 	{
 		result.success = frelements.remove(goal->id.c_str());
 		if (result.success > 0)
@@ -110,8 +138,7 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			server->setAborted(result);
 		}
 	}
-
-	else if (goal->action == "debug")
+	else if (goal->operation == "debug")
 	{
 		result.success = true;	
 		result.message = "Debug printed";

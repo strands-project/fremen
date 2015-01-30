@@ -1,5 +1,5 @@
 #goal definition
-string   action	 	#the action can be 'add', 'predict', 'entropy', 'evaluate', 'update' and 'delete'
+string   operation 	#the operation can be 'add', 'predict', 'entropy', 'evaluate', 'update' and 'delete'
 			#'add' adds a sequence of given (by ID) state measurements and the times these have been obtained to the state's model, if ID is given for the first time, a new state is created and added to the model
 			#'predict'  calculates a sequence of probabilities of the state ID for the given times
 			#'entropy'  calculates a sequence of entropies of the state ID for the given times - this is to support exploration

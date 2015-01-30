@@ -9,25 +9,25 @@ This ability is beneficial for tasks like self-localization, object search, path
 
 The FremenServer is an action server that maintains a collection of state models, each with a different **id**.
 Six different operations can be performed with each state held in the collection.
-These correspond to six types of goals specified in the **action** string that are related to a state given by its **id**.
+These correspond to six types of goals specified in the **operation** string that are related to a state given by its **id**.
 
-##The **add** action
+###The 'add' operation
 
 This allows to add a sequence of observed **states** along with the **times** of observations to the model of the state **id**.
 If the **id** is given for the first time, a new state is created and filled with the values.
-The **add** action remembers the last timestamp that was provided and adds only newer observation to the model.
+The **add** operation remembers the last timestamp that was provided and adds only newer observation to the model.
 
 ####Inputs
 - **id** identification of the state that is concerned. If the **id** did not exist, a new state will be created. 
 - **states** a sequence of zeroes and ones observed at
 - **times** which are in seconds. The length of the fields **times** and **states** has to be the same.
 
-####Output
+####Outputs
 - **success** contains a number of observation added to the model. Note that this might be lower than the length of the **states** in case that some of the **times** are older that the **times** of the previous step. Equals to -2 if **times** and **states** have different lengths. 
 - **message** contains more detailed report or error message.
 
-###The 'predict' action
-This action calculates the **probabilities** of the state **id**  for the given **times**.
+###The 'predict' operation
+This operation calculates the **probabilities** of the state **id**  for the given **times**.
 
 ####Inputs
 - **id** is identification of the state that is concerned. If the **id** does not exist, an error is reported.
@@ -39,8 +39,8 @@ This action calculates the **probabilities** of the state **id**  for the given 
 - **message** contains a detailed report or error message.
 - **probabilities** is an array of predicted probabilities of the state **id** at given **times**.
 
-###The 'entropy' action 
-This action calculates the **entropies** of the state **id**  for the given **times**.
+###The 'entropy' operation 
+This operation calculates the **entropies** of the state **id**  for the given **times**.
 
 ####Inputs
 - **id** is an identification of the state that is concerned. If the **id** did not exist, an error is reported.
@@ -52,8 +52,8 @@ This action calculates the **entropies** of the state **id**  for the given **ti
 - **message** contains a detailed report or an error message.
 - **entropies** is an array of state's **id** predicted entropies at given **times**.
 
-###The 'evaluate' action 
-The **evaluate** action is meant to support decisions what model order to use for probability and entropy predictions.
+###The 'evaluate' operation 
+The **evaluate** operation is meant to support decisions what model order to use for probability and entropy predictions.
 It allows to calculate the prediction error of the various model orders of a given (by **id**) state.
 The user provides a sequence of observed **states** and **times** of observations and a maximal **order** to be evaluated.
 The server performs predictions for the given **times** and **orders**, compares those with the provided **states** and calculates the percentage of unsuccessful predictions for model orders from 0 to **order**.
@@ -69,16 +69,15 @@ The server performs predictions for the given **times** and **orders**, compares
 - **message** contains a detailed report or an error message.
 - **errors** is an array of prediction errors for model orders from 0 to **order**.
 
-###The 'delete' action 
+###The 'delete' operation 
 Deletes a state with a given **id** from the state collection held in the server.
 
 ####Inputs
 - **id** identification of the state that is concerned. If the **id** did not exist, an error is reported.
 
 ####Outputs
-- **success** contains the number of states in the collection before the action was called. 
+- **success** contains the number of states in the collection before the operation was performed. 
 - **message** contains a detailed report or an error message.
 
-###The 'update' action 
-
+###The 'update' operation 
 Reserved for future use when FreMEn is fused with Gaussian Mixture Models.

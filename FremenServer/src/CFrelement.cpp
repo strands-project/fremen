@@ -5,8 +5,8 @@ static bool debug = false;
 
 int fremenSort(const void* i,const void* j) 
 {
-	 if (((SFrelement*)i)->amplitude > ((SFrelement*)j)->amplitude) return -1;
-	 return 1;
+	 if (((SFrelement*)i)->amplitude < ((SFrelement*)j)->amplitude) return +1;
+	 return -1;
 }
 
 CFrelement::CFrelement(const char* name)
