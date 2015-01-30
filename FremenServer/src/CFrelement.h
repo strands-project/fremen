@@ -36,21 +36,18 @@ class CFrelement
 		~CFrelement();
 
 		//adds a serie of measurements to the data
-		void add(uint32_t times[],unsigned char states[],int length);
+		int add(uint32_t times[],unsigned char states[],int length);
 
 		//estimates the probability for the given times 
-		void estimate(uint32_t times[],float probs[],int length,int order);
+		int estimate(uint32_t times[],float probs[],int length,int order);
 
 		//estimates the state's entropy for the given times 
-		void estimateEntropy(uint32_t times[],float entropy[],int length,int order);
+		int estimateEntropy(uint32_t times[],float entropy[],int length,int order);
 
 		//evaluates the error of the predictions for the given times and measurements
 		int evaluate(uint32_t* times,unsigned char* signal,int length,int orderi,float* evals);
 	
-		void build(int* times,float* signal,int length,int orderi,unsigned char* status = NULL);
-		unsigned char retrieve(unsigned long int timeStamp);
 		void update(int modelOrder);
-		float estimate(int time);
 		void print(bool verbose=true);
 
 		int save(FILE* file,bool lossy = false);
@@ -62,8 +59,8 @@ class CFrelement
 		char id[MAX_ID_LENGTH];
 		SFrelement frelements[NUM_PERIODICITIES];
 		int measurements,order;
-		uint32_t firstTime;
-		uint32_t lastTime;
+		int64_t firstTime;
+		int64_t  lastTime;
 };
 
 #endif

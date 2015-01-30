@@ -41,7 +41,7 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 	/*perform model update (if needed)*/
 	if (goal->action == "update")
 	{
-		if (frelements.update(goal->id.c_str(),goal->order)){
+		if (frelements.update(goal->id.c_str(),goal->order)>=0){
 			result.message = "Fremen model updated";
 			result.success = true;
 			server->setSucceeded(result);
@@ -53,10 +53,10 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 	}
 	else if (goal->action == "add")
 	{
-		result.success = true;
-		if (frelements.add(goal->id.c_str(),(uint32_t*)goal->times.data(),(unsigned char*)goal->states.data(),(int)goal->states.size()))
+		result.success = frelements.add(goal->id.c_str(),(uint32_t*)goal->times.data(),(unsigned char*)goal->states.data(),(int)goal->states.size());
+		if (result.success >=0)
 		{
-			mess << "Added " << (int)goal->states.size() << " measurements to the state " << goal->id;
+			mess << "Added " << result.success << " of the " << (int)goal->states.size() << " provided measurements to the state " << goal->id;
     			result.message = mess.str(); 
 		}else{
 			mess << "A new state " <<  goal->id << " was added to the collection and filled with "  << (int)goal->states.size() << " measurements.";
@@ -66,12 +66,12 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 	}	
 	else if (goal->action == "predict")
 	{
-		float probabilities[goal->times.size()];
-		result.success = frelements.estimate(goal->id.c_str(),(uint32_t*)goal->times.data(),probabilities,(int)goal->times.size(),goal->order);
-		if (result.success)
+		float probs[goal->times.size()];
+		result.success = frelements.estimate(goal->id.c_str(),(uint32_t*)goal->times.data(),probs,(int)goal->times.size(),goal->order);
+		if (result.success >=0)
 		{
 			mess << "Performed " << (int)goal->times.size() << " predictions of the state " << goal->id;
-			result.probability.assign(probabilities,probabilities + (int)goal->times.size());
+			result.probabilities.assign(probs,probs + (int)goal->times.size());
 			result.message = mess.str();
 			server->setSucceeded(result);
 		}else{
@@ -83,34 +83,30 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 	else if (goal->action == "evaluate")
 	{
 		float evaluations[goal->order+1];
-		int bestOrder = frelements.evaluate(goal->id.c_str(),(uint32_t*)goal->times.data(),(unsigned char*)goal->states.data(),(int)goal->times.size(),goal->order,evaluations);
-		if (bestOrder >= 0)
+		result.success = frelements.evaluate(goal->id.c_str(),(uint32_t*)goal->times.data(),(unsigned char*)goal->states.data(),(int)goal->times.size(),goal->order,evaluations);
+		if (result.success >= 0)
 		{
-			mess << "Performed " <<  (goal->order+1) << " evaluations of the model "  << goal->id << " using " << (int)goal->times.size() << " ground truth values. The best performing model has order " << bestOrder;
-			result.success = true;
+			mess << "Performed " <<  (goal->order+1) << " evaluations of the model "  << goal->id << " using " << (int)goal->times.size() << " ground truth values. The best performing model has order " << result.success;
 			result.message = mess.str();
 			result.errors.assign(evaluations,evaluations + goal->order+1);
 			server->setSucceeded(result);
 		}else{
 			mess << "State ID " << goal->id << " does not exist.";
 			result.message = mess.str();
-			result.success = false;
 			server->setAborted(result);
 		}
 	}
 	else if (goal->action == "remove")
 	{
-		int num = frelements.remove(goal->id.c_str());
-		if (num > 0)
+		result.success = frelements.remove(goal->id.c_str());
+		if (result.success > 0)
 		{
-			mess << "State ID " << goal->id << " removed from the collection of " << num << " states.";
+			mess << "State ID " << goal->id << " removed from the collection of " << result.success << " states.";
 			result.message = mess.str();
-			result.success = true;
 			server->setSucceeded(result);
 		}else{
 			mess << "State ID " << goal->id << " does not exist.";
 			result.message = mess.str();
-			result.success = false;
 			server->setAborted(result);
 		}
 	}

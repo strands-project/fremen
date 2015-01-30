@@ -18,7 +18,8 @@ CFrelement::CFrelement(const char* name)
 	for (int i=0;i<NUM_PERIODICITIES;i++) frelements[i].period = (7*24*3600)/(i+1); 
 	gain = 0;
 	order = 0;
-	order = 5;
+	firstTime = -1;
+	lastTime = -1;
 	measurements = 0;
 }
 
@@ -26,11 +27,9 @@ CFrelement::~CFrelement()
 {
 }
 
-// adds new measurement at time a
-void CFrelement::add(uint32_t times[],unsigned char states[],int length)
+// adds new state observations at given times
+int CFrelement::add(uint32_t times[],unsigned char states[],int length)
 {
-
-	// adds new measurement at time a
 	if (measurements == 0 && length > 0)
 	{
 		for (int i = 0;i<NUM_PERIODICITIES;i++){
@@ -40,14 +39,20 @@ void CFrelement::add(uint32_t times[],unsigned char states[],int length)
 		firstTime = times[0];
 	}
 	int duration = times[length-1]-firstTime;
+	int firstIndex = 0;
+
+	//discard already known observations 
+	for (int i=0;i<length;i++)if (times[i] <= lastTime)firstIndex++;
+	int numUpdated = length-firstIndex;
+	lastTime = times[length-1];
 
 	//verify if there is an actual update
-	if (length <= 0)return;
+	if (numUpdated <= 0)return numUpdated;
 
 	//update the gains accordingly 
 	float oldGain=0;
 	float newGain=0;
-	for (int j = 0;j<length;j++)newGain+=states[j];
+	for (int j = firstIndex;j<length;j++)newGain+=states[j];
 	gain = (gain*measurements+newGain)/(measurements+length);
 
 	//recalculate spectral balance - this is beneficial is the process period does not match the length of the data
@@ -68,7 +73,7 @@ void CFrelement::add(uint32_t times[],unsigned char states[],int length)
 
 	float angle = 0;
 	//recalculate the spectral components
-	for (int j = 0;j<length;j++)
+	for (int j = firstIndex;j<length;j++)
 	{
 		for (int i = 0;i<NUM_PERIODICITIES;i++)
 		{
@@ -96,7 +101,7 @@ void CFrelement::add(uint32_t times[],unsigned char states[],int length)
 	//sort the spectral components
 	qsort(frelements,NUM_PERIODICITIES,sizeof(SFrelement),fremenSort);
 
-	return; 
+	return numUpdated; 
 }
 
 int CFrelement::evaluate(uint32_t* times,unsigned char* signal,int length,int orderi,float* evals)
@@ -117,6 +122,8 @@ int CFrelement::evaluate(uint32_t* times,unsigned char* signal,int length,int or
 		}
 	}
 	for (int j = 0;j<=order+1;j++) evals[j]=evals[j]/length;
+
+	//get best model order
 	float error = 10.0;
 	int index = 0;
 	for (int j = 0;j<=orderi;j++)
@@ -150,7 +157,7 @@ void CFrelement::print(bool verbose)
 	std::cout << endl; 
 }
 
-void CFrelement::estimate(uint32_t times[],float probs[],int length,int orderi)
+int CFrelement::estimate(uint32_t times[],float probs[],int length,int orderi)
 {
 	float estimate = 0;
 	float time;
@@ -163,9 +170,10 @@ void CFrelement::estimate(uint32_t times[],float probs[],int length,int orderi)
 		if (estimate < 0.0) estimate =  0.0;
 		probs[j]=estimate;
 	}
+	return length;
 }
 
-void CFrelement::estimateEntropy(uint32_t times[],float entropy[],int length,int orderi)
+int CFrelement::estimateEntropy(uint32_t times[],float entropy[],int length,int orderi)
 {
 	float estimate = 0;
 	float time;
@@ -176,16 +184,7 @@ void CFrelement::estimateEntropy(uint32_t times[],float entropy[],int length,int
 		for (int i = 0;i<orderi;i++) estimate+=2*frelements[i].amplitude*cos(time/frelements[i].period*2*M_PI-frelements[i].phase);
 		if (estimate <= 0 || estimate >= 1) entropy[j] = 0; else  entropy[j] = -(estimate*log2f(estimate)+(1-estimate)*log2f((1-estimate)));
 	}
-}
-float CFrelement::estimate(int time)
-{
-	float estimate = gain;
-	for (int i = 0;i<order-1;i++){
-		estimate+=2*frelements[i].amplitude*cos(time/frelements[i].period*2*M_PI-frelements[i].phase);
-	}
-//	if (estimate > 1.0) return 1.0;
-//	if (estimate < 0.0) return 0.0;
-	return estimate;
+	return length;
 }
 
 int CFrelement::save(char* name,bool lossy)

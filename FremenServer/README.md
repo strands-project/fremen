@@ -3,47 +3,78 @@
 The fremenserver package contains FreMEn-based  navigation.
 
 # Practical 
-The FreNap package contains an action server that receives four types of goals specified in the action string.
+
+The FreNap package contains an action server that receives six types of goals specified in the *action* string that are related to a state given by its *id*.
 
 ##The **add** action
 
-retrieves the data from the Mongo and builds the FreMEn models:
+This allows to add a sequence of observed *states* along with the *times* of ofservations to the model of the state *id*.
+If the *id* is given for the first time, a new state is created and filled with the values.
+The *add* action remembers the last timestamp that was provided and adds only newer observation to the model.
 
 ###input:
-- **mapName** with the topological map name that you want to process,
-- **resultOrder** which is FreMEn order for the result prediction - I recommend the values 2 or 1, but you can also let FreNaP to choose the model by entering the value of -1.
-- **timeOrder** which is FreMEn order for the duration prediction -  I recommend a static model for that, but again, you can enter -1 and FreNaP will choose the model order with the best estimation (not prediction!) accuracy.
+- **id** identification of the state that is concerned. If the **id** did not exist, a new state will be created 
+- **states** a sequence of 0 and 1 observed at
+- **times** which are in seconds. The length of the fields **times** and **states** has to be the same.
 
 ###output:
-- **status** - string containing the number of edges,
-- **edgeName** - list of edges,
-- **probability** - list of the model reconstruction errors (for the individual edges) as defined in the FreMEn [paper](http://labe.felk.cvut.cz/~tkrajnik/papers/fremen_2014_ICRA.pdf),
-- **duration** - average duration prediction error (for the individual edges). 
+- **success** - success of the action.
+- **message** - a detailed report or error message.
 
 ##The **predict** action
-performs the prediction for a particular time given in epoch seconds,
+This action calculates the *probabilities* of the state *id*  for the given *times*.
 
 ###input:
-- **predictionTime**: in seconds since epoch,
+- **id** identification of the state that is concerned. If the **id** did not exist, an error is reported.
+- **times** at which the **probabilities** of the state should be estimated (in seconds).
+- **order** of the model used for the estimation. The **order** equals to the number of periodic processes to be modeled. Setting order to 0 results in a static model, i.e. with **probabilities** constant in time.
 
 ###output:
-- **edgeName**:   list of edges,
-- **probabilities**: list of predicted probabilities that the edge will be traversed successfully,
-- **durations**: list of predicted durations.
+- **success** - success of the action.
+- **message** - a detailed report or error message.
+- **probabilities**: list of predicted probabilities of the state **id** at given **times**.
 
-##The **timeline** action 
-allows to recover several predictions for a particular edge
+##The **entropy** action 
+This action calculates the *entropy* of the state *id*  for the given *times*.
 
 ###input:
-- **mapName**:  name of the edge to get the prediction time-line,
-- **startTime**:  the starting time of the predictions,
-- **endTime**:  the final time of the predictions,
-- **predictionTime**:  the time step between the two previous times.
+- **id** identification of the state that is concerned. If the **id** did not exist, an error is reported.
+- **times** at which the **entropies** of the state should be estimated (in seconds).
+- **order** of the model used for the estimation. The **order** equals to the number of periodic processes to be modeled. Setting order to 0 results in a static model, so that the **entropies** will be constant in time.
 
 ###output:
-- **probabilities**: list of predicted probabilities that the edge will be traversed successfully,
-- **durations**: list of predicted durations.
+- **success** - success of the action.
+- **message** - a detailed report or error message.
+- **entropies**: list of predicted entropies of the state **id** at given **times**.
 
-##The **debug** action 
-The debug action prints detailed info about the edge given in
--**mapName** with the topological map name that you want to process,
+##The **evaluate** action 
+The evaluate action is meant to support decisions what model order to use for probability and entropy predictions.
+It allows to calculate the prediction error of the various orders models with differen of a given (by *id*) state .
+The user provides a sequence of observed *states* and *times* of observations and a maximal *order* to be evaluated.
+The server performs predictions for the given *times* and *orders*, compares those with the provided *states* and calculates the percetage of unsuccessful predictions for model orders from 0 to *order*.
+
+###input:
+- **id** identification of the state that is concerned. If the **id** did not exist, an error is reported.
+- **states** is a sequence of zeros and one indicating the states at  
+- **times** which are in seconds. The length of the fields **times** and **states** has to be the same.
+- **order** is the maximal model order to be evaluated. 
+
+###output:
+- **success** contains the best performing model order.
+- **message** contains a detailed report or an error message.
+- **errors** is an array of prediction errors for model orders from 0 to **order**.
+
+##The **update** action 
+
+Reserved for future use when FreMEn is fused with Gaussian Mixture Models.
+
+##The **delete** action 
+
+Deletes a state with a given *id* from the state collection held in the server.
+
+###input:
+- **id** identification of the state that is concerned. If the **id** did not exist, an error is reported.
+
+###output:
+- **success** contains the number of states in the collection before the action was called. 
+- **message** contains a detailed report or an error message.

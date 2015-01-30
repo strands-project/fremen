@@ -14,7 +14,7 @@ CFrelementSet::~CFrelementSet()
 	for (int i=0;i<numFrelements;i++) delete frelements[i];
 }
 
-bool CFrelementSet::add(const char *name,uint32_t times[],unsigned char states[],int length)
+int CFrelementSet::add(const char *name,uint32_t times[],unsigned char states[],int length)
 {
 	bool exists = find(name);
 	if (exists == false){
@@ -23,31 +23,29 @@ bool CFrelementSet::add(const char *name,uint32_t times[],unsigned char states[]
 		active = frelements[numFrelements-1];
 	}
 	//printf("Add %i %s \n",activeIndex,active->id);
-	active->add(times,states,length);
-	return exists;
+	return active->add(times,states,length);
 }
 
 int CFrelementSet::evaluate(const char *name,uint32_t times[],unsigned char states[],int length,int order,float errors[])
 {
-	if (find(name) == false)return -1;
+	if (find(name) == false) return -1;
 	return active->evaluate(times,states,length,order,errors);;
 }
 
-bool CFrelementSet::estimate(const char *name,uint32_t times[],float probs[],int length,int order)
+int CFrelementSet::estimate(const char *name,uint32_t times[],float probs[],int length,int order)
 {
-	if (find(name) == false)return false;
+	if (find(name) == false)return -1;
 	//printf("Estimate %i %s \n",activeIndex,active->id);
-	active->estimate(times,probs,length,order);
-	return true;
+	return active->estimate(times,probs,length,order);
 }
 
-bool CFrelementSet::estimateEntropy(const char *name,uint32_t times[],float entropy[],int length,int order)
+int CFrelementSet::estimateEntropy(const char *name,uint32_t times[],float entropy[],int length,int order)
 {
-	if (find(name) == false)return false;
+	if (find(name) == false)return -1;
 	//printf("Estimate %i %s \n",activeIndex,active->id);
-	active->estimateEntropy(times,entropy,length,order);
-	return true;
+	return active->estimateEntropy(times,entropy,length,order);
 }
+
 bool CFrelementSet::find(const char *name)
 {
 	int i = 0;
