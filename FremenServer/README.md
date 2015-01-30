@@ -47,34 +47,34 @@ This action calculates the *entropy* of the state *id*  for the given *times*.
 - **message** - a detailed report or error message.
 - **entropies**: list of predicted entropies of the state **id** at given **times**.
 
-##The **evaluate** action 
+###The **evaluate** action 
 The evaluate action is meant to support decisions what model order to use for probability and entropy predictions.
 It allows to calculate the prediction error of the various orders models with differen of a given (by *id*) state .
 The user provides a sequence of observed *states* and *times* of observations and a maximal *order* to be evaluated.
 The server performs predictions for the given *times* and *orders*, compares those with the provided *states* and calculates the percetage of unsuccessful predictions for model orders from 0 to *order*.
 
-###input:
+###3input:
 - **id** identification of the state that is concerned. If the **id** did not exist, an error is reported.
 - **states** is a sequence of zeros and one indicating the states at  
 - **times** which are in seconds. The length of the fields **times** and **states** has to be the same.
 - **order** is the maximal model order to be evaluated. 
 
-###output:
+####output:
 - **success** contains the best performing model order.
 - **message** contains a detailed report or an error message.
 - **errors** is an array of prediction errors for model orders from 0 to **order**.
 
-##The **update** action 
+###The **update** action 
 
 Reserved for future use when FreMEn is fused with Gaussian Mixture Models.
 
-##The **delete** action 
+###The **delete** action 
 
 Deletes a state with a given *id* from the state collection held in the server.
 
-###input:
+####input:
 - **id** identification of the state that is concerned. If the **id** did not exist, an error is reported.
 
-###output:
+####output:
 - **success** contains the number of states in the collection before the action was called. 
 - **message** contains a detailed report or an error message.
