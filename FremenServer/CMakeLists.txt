@@ -21,6 +21,8 @@ include_directories(${catkin_INCLUDE_DIRS})
 
 add_executable(fremenserver src/fremenserver.cpp)
 
+add_dependencies(fremenserver ${catkin_EXPORTED_TARGETS} mongodb_store)
+
 add_library(fremenserver_frelement src/CFrelement.cpp)
 add_library(fremenserver_timer src/CTimer.cpp)
 add_library(fremenserver_frelementset src/CFrelementSet.cpp)
