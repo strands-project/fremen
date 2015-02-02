@@ -1,0 +1,28 @@
+#goal definition
+string   operation 	#the operation can be 'add', 'predict', 'entropy', 'evaluate', 'update' and 'delete'
+			#'add' adds a sequence of given (by ID) state measurements and the times these have been obtained to the state's model, if ID is given for the first time, a new state is created and added to the model
+			#'predict'  calculates a sequence of probabilities of the state ID for the given times
+			#'entropy'  calculates a sequence of entropies of the state ID for the given times - this is to support exploration
+			#'evaluate' predicts the state for the given times, compares the prediction with ground truth and returns the prediction errors for model orders from 0 to the order specified. Meant to help to decide which order to use for the 'predict' action. 
+			#'delete' removes the current state from the collection of states   
+			#'update' is reserved, will be used int the future for recalculating the models
+
+string   id	  	#specifies the ID of the state to be manipulated 
+uint32[]  times 	#the time instants for the 'predict', 'add', 'entropy' and 'evaluate' actions
+
+#specific for the 'predict' and 'evaluate' actions
+int32    order 		#number of periodic processes to use for the purpose of prediction (0 means a static model, -1 is an adaptive model, typical value is 2), maximal order used for evaluation of the 'evaluate' action
+
+#specific for the 'add' and 'evaluate' action
+bool[]   states   	#sequence of states observed at the particular times - specific to the 'add' action
+
+---
+#result definition
+int32 success		#action result - positive value indicates success, negative indicates error
+string message 		#detailed message
+float32[] probabilities	#probabilities of the states calculated by the 'predict' action for the particular 'times'
+float32[] entropies	#entropies of the states calculated by the 'entropy' action for the particular 'times'
+float32[] errors 	#prediction errors for the various model orders given by the 'evaluate' action
+---
+#feedback
+string status
