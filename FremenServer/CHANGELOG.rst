@@ -2,8 +2,8 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2015-03-04)
+------------------
 * Message generation now in CMakelist
 * Dependency added
 * Favours slower dynamics, entropy predictions.
