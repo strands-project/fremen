@@ -32,6 +32,7 @@ add_library(frenap_edge_statistics src/CEdgeStatistics.cpp)
 add_library(frenap_timer src/CTimer.cpp)
 
 target_link_libraries(frenap_frelement frenap_timer)
+target_link_libraries(frenap_edge_statistics frenap_frelement)
 target_link_libraries(frenap frenap_edge_statistics)
 target_link_libraries(frenap-standalone frenap_frelement)
 target_link_libraries(frenap ${catkin_LIBRARIES} frenap_frelement)
