@@ -4,7 +4,7 @@
 
 using namespace std;
 int times[MAX_LENGTH]; 
-float signal[MAX_LENGTH]; 
+float signalBuffer[MAX_LENGTH]; 
 int signalLength = 0;
 CFrelement frelement;
 long int firstTime = 0;
@@ -31,16 +31,19 @@ int loadSignal(char* name)
 		ret = fscanf(file,"%ld %f\n",&timeO,&signalO);
 		if (signalLength == 0) firstTime = timeO;
 		times[signalLength] = (int)(timeO-firstTime);
-		signal[signalLength] = signalO;		
+		signalBuffer[signalLength] = signalO;		
 		signalLength++;
 	}
 	fclose(file);
 }
 
+
+
 int main(int argc,char* argv[])
 {
 	loadSignal(argv[1]);
-	frelement.build(times,signal,signalLength,atoi(argv[2]),NULL);
+	frelement.build(times,signalBuffer,signalLength,atoi(argv[2]),NULL);
 	for (int i = times[0];i<times[signalLength-1];i+=atoi(argv[3])) printf("%ld %f\n",i+firstTime,frelement.estimate(i)); 
 	return 0;
 }
+
