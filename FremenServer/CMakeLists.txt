@@ -33,7 +33,7 @@ target_link_libraries (fremenserver ${catkin_LIBRARIES} fremenserver_frelementse
 
 
 # Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS fremenserver fremenserver_frelement fremenserver_timer fremenserver_frelementset
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
