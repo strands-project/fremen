@@ -29,8 +29,13 @@ add_library(fremenserver_frelementset src/CFrelementSet.cpp)
 
 target_link_libraries(fremenserver_frelement fremenserver_timer)
 target_link_libraries(fremenserver_frelementset fremenserver_frelement)
+target_link_libraries (fremenserver ${catkin_LIBRARIES} fremenserver_frelementset)
 
-target_link_libraries (fremenserver
-		${catkin_LIBRARIES}
-		fremenserver_frelementset
+
+# Mark executables and/or libraries for installation
+install(TARGETS fremenserver fremenserver_frelement fremenserver_timer fremenserver_frelementset
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
