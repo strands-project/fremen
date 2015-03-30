@@ -2,6 +2,11 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fixes for compilation on OS X.
+* Contributors: Nick Hawes
+
 0.1.1 (2015-03-04)
 ------------------
 

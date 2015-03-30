@@ -2,6 +2,12 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added libs too. This fixes `#11 <https://github.com/strands-project/fremen/issues/11>`_.
+* Added install target for fremenserver. This fixes `#11 <https://github.com/strands-project/fremen/issues/11>`_.
+* Contributors: Nick Hawes
+
 0.1.1 (2015-03-04)
 ------------------
 * Message generation now in CMakelist
