@@ -2,8 +2,8 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.2 (2015-03-30)
+------------------
 * Added libs too. This fixes `#11 <https://github.com/strands-project/fremen/issues/11>`_.
 * Added install target for fremenserver. This fixes `#11 <https://github.com/strands-project/fremen/issues/11>`_.
 * Contributors: Nick Hawes
