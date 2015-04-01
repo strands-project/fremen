@@ -28,6 +28,7 @@ The **add** operation remembers the last timestamp that was provided and adds on
 
 ###The 'predict' operation
 This operation calculates the **probabilities** of the state **id**  for the given **times**.
+Can predict the probability of one state for several time instants.
 
 ####Inputs
 - **id** is identification of the state that is concerned. If the **id** does not exist, an error is reported.
@@ -38,6 +39,21 @@ This operation calculates the **probabilities** of the state **id**  for the giv
 - **success** contains the number of predicted states or -1 if the state **id** does not exist.
 - **message** contains a detailed report or error message.
 - **probabilities** is an array of predicted probabilities of the state **id** at given **times**.
+
+###The 'forecast' operation
+This operation calculates the **probabilities** of the states in the **ids** array for the  **times**.
+Can predict the probability of several states for one time instant.
+
+####Inputs
+- **ids** is identification of the states concerned. If the **ids** is not filled, an error is reported.
+- **times** at which the **probabilities** of the states should be estimated (in seconds). Must have length 1, otherwise an error is reported. 
+- **order** of the model used for the estimation. The **order** equals to the number of periodic processes to be modeled. Setting the order to 0 results in a static model with **probabilities** constant in time.
+
+####Outputs
+- **success** contains the number of predicted states, or -1 then error.
+- **message** contains a detailed report or error message.
+- **probabilities** is an array of predicted probabilities of the states **ids** at given **times**.
+
 
 ###The 'entropy' operation 
 This operation calculates the **entropies** of the state **id**  for the given **times**.
