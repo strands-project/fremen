@@ -1,13 +1,15 @@
 #goal definition
-string   operation 	#the operation can be 'add', 'predict', 'entropy', 'evaluate', 'update' and 'delete'
+string   operation 	#the operation can be 'add', 'predict', 'forecast', 'entropy', 'evaluate', 'update' and 'delete'
 			#'add' adds a sequence of given (by ID) state measurements and the times these have been obtained to the state's model, if ID is given for the first time, a new state is created and added to the model
-			#'predict'  calculates a sequence of probabilities of the state ID for the given times
+			#'predict'  calculates a sequence of probabilities of the state ID for the given times (i.e. prediction of one state for multiple time instants)
+			#'forecast'  calculates a sequence of probabilities of the states with given 'ids' for the given time (i.e. prediction of mutiple states for a single time instant)
 			#'entropy'  calculates a sequence of entropies of the state ID for the given times - this is to support exploration
 			#'evaluate' predicts the state for the given times, compares the prediction with ground truth and returns the prediction errors for model orders from 0 to the order specified. Meant to help to decide which order to use for the 'predict' action. 
 			#'delete' removes the current state from the collection of states   
 			#'update' is reserved, will be used int the future for recalculating the models
 
-string   id	  	#specifies the ID of the state to be manipulated 
+string  id	  	#specifies the ID of the state to be manipulated 
+string[]  ids	  	#specifies the IDs of the states to be manipulated - explusively fot the 'forecast' action
 uint32[]  times 	#the time instants for the 'predict', 'add', 'entropy' and 'evaluate' actions
 
 #specific for the 'predict' and 'evaluate' actions
