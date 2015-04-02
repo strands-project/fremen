@@ -13,7 +13,10 @@ string[]  ids	  	#specifies the IDs of the states to be manipulated - explusivel
 uint32[]  times 	#the time instants for the 'predict', 'add', 'entropy' and 'evaluate' actions
 
 #specific for the 'predict' and 'evaluate' actions
-int32    order 		#number of periodic processes to use for the purpose of prediction (0 means a static model, -1 is an adaptive model, typical value is 2), maximal order used for evaluation of the 'evaluate' action
+int32    order 		#number of periodic processes to use for the purpose of prediction (0 means a static model, typical value is 2), maximal order used for evaluation of the 'evaluate' action
+
+#specific for the 'forecast' actions
+int32[]  orders	  	#same as previous one, but for all states in the **ids** 
 
 #specific for the 'add' and 'evaluate' action
 bool[]   states   	#sequence of states observed at the particular times - specific to the 'add' action
