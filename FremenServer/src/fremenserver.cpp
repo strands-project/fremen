@@ -112,11 +112,14 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 	{
 		float probabilities[goal->ids.size()];
 		float probs[1];
+		int32_t order = goal->order; 
 		result.success = -1;
 		if (goal->times.size() == 1){
 			result.success = 0; 
-			for (int i=0;i<goal->ids.size();i++){
-				if (frelements.estimate(goal->ids[i].c_str(),(uint32_t*)goal->times.data(),probs,1,goal->order)==1){
+			for (int i=0;i<goal->ids.size();i++)
+			{
+				if (goal->ids.size()==goal->orders.size()) order = goal->orders[i]; 
+				if (frelements.estimate(goal->ids[i].c_str(),(uint32_t*)goal->times.data(),probs,1,order)==1){
 					probabilities[i] = probs[0];
 					result.success++;
 				}else{

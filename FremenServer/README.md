@@ -47,7 +47,8 @@ Can predict the probability of several states for one time instant.
 ####Inputs
 - **ids** is identification of the states concerned. If the **ids** is not filled, an error is reported.
 - **times** at which the **probabilities** of the states should be estimated (in seconds). Must have length 1, otherwise an error is reported. 
-- **order** of the model used for the estimation. The **order** equals to the number of periodic processes to be modeled. Setting the order to 0 results in a static model with **probabilities** constant in time.
+- **orders** of the model used for the estimation. Each **orders** element equals to the number of periodic processes to be modeled for a given state. Setting the order to 0 results in a static model with **probabilities** constant in time.
+- **order** alternatively, the same **order** can be used for all states. The **order** is used instead of **orders** if the number of elements in the **ids** and **orders** differ.
 
 ####Outputs
 - **success** contains the number of predicted states, or -1 then error.
