@@ -44,10 +44,10 @@ int CFrelement::add(uint32_t times[],unsigned char states[],int length)
 	//discard already known observations 
 	for (int i=0;i<length;i++)if (times[i] <= lastTime)firstIndex++;
 	int numUpdated = length-firstIndex;
-	lastTime = times[length-1];
 
 	//verify if there is an actual update
 	if (numUpdated <= 0)return numUpdated;
+	lastTime = times[length-1];
 
 	//update the gains accordingly 
 	float oldGain=0;
