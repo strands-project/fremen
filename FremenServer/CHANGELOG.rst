@@ -2,6 +2,13 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Minor bug in last added data timestamp removed.
+* Separate orders for the states in the forecast action.
+* Forecast - predicting multiple states
+* Contributors: Jaime Pulido Fentanes, Tom Krajnik
+
 0.1.2 (2015-03-30)
 ------------------
 * Added libs too. This fixes `#11 <https://github.com/strands-project/fremen/issues/11>`_.
