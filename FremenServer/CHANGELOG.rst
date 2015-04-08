@@ -2,8 +2,8 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.3 (2015-04-08)
+------------------
 * Minor bug in last added data timestamp removed.
 * Separate orders for the states in the forecast action.
 * Forecast - predicting multiple states
