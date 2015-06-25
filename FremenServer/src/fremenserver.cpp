@@ -155,6 +155,37 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			server->setAborted(result);
 		}
 	}
+	else if (goal->operation == "forecastEntropy")
+	{
+		float probabilities[goal->ids.size()];
+		float probs[1];
+		int32_t order = goal->order; 
+		result.success = -1;
+		if (goal->times.size() == 1){
+			result.success = 0; 
+			for (int i=0;i<goal->ids.size();i++)
+			{
+				if (goal->ids.size()==goal->orders.size()) order = goal->orders[i]; 
+				if (frelements.estimateEntropy(goal->ids[i].c_str(),(uint32_t*)goal->times.data(),probs,1,order)==1){
+					probabilities[i] = probs[0];
+					result.success++;
+				}else{
+					probabilities[i] = -1;
+				}				
+			}
+		}
+		if (result.success >=0)
+		{
+			mess << "Predicted the entropies of " << (int)goal->ids.size() << " states ";
+			result.entropies.assign(probabilities,probabilities + (int)goal->ids.size());
+			result.message = mess.str();
+			server->setSucceeded(result);
+		}else{
+			mess << "The forecast service failed - the ''times'' argument did not have length equal to 1.";
+			result.message = mess.str();
+			server->setAborted(result);
+		}
+	}
 	else if (goal->operation == "remove")
 	{
 		result.success = frelements.remove(goal->id.c_str());
