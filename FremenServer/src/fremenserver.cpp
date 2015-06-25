@@ -131,6 +131,7 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 		{
 			mess << "Predicted the probabilities of " << (int)goal->ids.size() << " states ";
 			result.probabilities.assign(probabilities,probabilities + (int)goal->ids.size());
+			result.entropies.clear();
 			result.message = mess.str();
 			server->setSucceeded(result);
 		}else{
@@ -178,6 +179,7 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 		{
 			mess << "Predicted the entropies of " << (int)goal->ids.size() << " states ";
 			result.entropies.assign(probabilities,probabilities + (int)goal->ids.size());
+			result.probabilities.clear();
 			result.message = mess.str();
 			server->setSucceeded(result);
 		}else{
