@@ -37,6 +37,9 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 	}
 	if (debug) ROS_DEBUG("Command received %s %s\n",goal->operation.c_str(),goal->id.c_str());
 
+	result.probabilities.clear();
+	result.entropies.clear();
+	result.errors.clear();
 	/*perform model update (if needed)*/
 	if (goal->operation == "update")
 	{
@@ -202,7 +205,33 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			server->setAborted(result);
 		}
 	}
-	else if (goal->operation == "debug")
+	else if (goal->operation == "view")
+	{
+		if (goal->order < NUM_PERIODICITIES){
+			float amplitudes[goal->order+1];
+			float periods[goal->order+1];
+			float phases[goal->order+1];
+			result.success = frelements.getModelParameters(goal->id.c_str(),periods,amplitudes,phases,goal->order);
+			if (result.success == goal->order)
+			{
+				mess << "Returning " << goal->order << " FreMen model parameters of "  << goal->id << ". The probabilities field contains frequencies, the entropies field contains phase amplitudes and the errors field contains phase shifts. Infinite period corresponds to static probability.";
+				result.probabilities.assign(periods,periods + (int)(goal->order+1));
+				result.entropies.assign(amplitudes,amplitudes + (int)(goal->order+1));
+				result.errors.assign(phases,phases + (int)(goal->order+1));
+
+				result.message = mess.str();
+				server->setSucceeded(result);
+			}else{
+				mess << "State ID " << goal->id << " does not exist.";
+				result.message = mess.str();
+				server->setAborted(result);
+			}
+		}else{
+			mess << "The maximal fremen order is " << NUM_PERIODICITIES << ". You can't ask for more.";
+			result.success = -1;
+			server->setAborted(result);
+		}
+	}else if (goal->operation == "debug")
 	{
 		result.success = true;	
 		result.message = "Debug printed";

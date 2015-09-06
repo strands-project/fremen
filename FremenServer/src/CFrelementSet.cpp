@@ -46,6 +46,22 @@ int CFrelementSet::estimateEntropy(const char *name,uint32_t times[],float entro
 	return active->estimateEntropy(times,entropy,length,order);
 }
 
+int CFrelementSet::getModelParameters(const char *name,float  periods[],float amplitudes[],float phases[],int order)
+{
+	if (find(name) == false)return -1;
+	if (order > NUM_PERIODICITIES) order = NUM_PERIODICITIES;
+	phases[0] = 0;
+	periods[0] = +1.0/0.0;		//this corresponds to a maximum periodicity
+	amplitudes[0] = active->gain;	//because the first element is the 'static' probability
+	for (int i = 0;i<order;i++)
+	{
+		periods[i+1]=active->frelements[i].period;
+		amplitudes[i+1]=active->frelements[i].amplitude;
+		phases[i+1]=active->frelements[i].phase;
+	}
+	return order;
+}
+
 bool CFrelementSet::find(const char *name)
 {
 	int i = 0;

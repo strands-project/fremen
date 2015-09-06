@@ -16,7 +16,7 @@ CFrelement::CFrelement(const char* name)
 	//initialization of the frequency set
 	for (int i=0;i<NUM_PERIODICITIES;i++) frelements[i].amplitude = frelements[i].phase = 0; 
 	for (int i=0;i<NUM_PERIODICITIES;i++) frelements[i].period = (7*24*3600)/(i+1); 
-	gain = 0;
+	gain = 0.5;
 	order = 0;
 	firstTime = -1;
 	lastTime = -1;
@@ -121,7 +121,7 @@ int CFrelement::evaluate(uint32_t* times,unsigned char* signal,int length,int or
 			 evals[i+1]+= abs(state-(estimate>0.5));
 		}
 	}
-	for (int j = 0;j<=order+1;j++) evals[j]=evals[j]/length;
+	for (int j = 0;j<=orderi;j++)evals[j]=evals[j]/length;
 
 	//get best model order
 	float error = 10.0;

@@ -58,6 +58,11 @@ class CFrelementSet
 		/*save the model to a file*/
 		bool save(FILE* file);
 
+		/*returns the FreMEn parameters of a given model
+		  returns -1 if the state with the given ID is not present in the collection
+		  otherwise returns the model order and fills the frequencies, amplitudes and phases arrays*/
+		int getModelParameters(const char *name,float  periods[],float amplitudes[],float phases[],int order);
+
 	private:
 		bool find(const char *name);
 		CFrelement* frelements[MAX_LENGTH];
