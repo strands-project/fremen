@@ -48,7 +48,7 @@ class CFrelement
 		int evaluate(uint32_t* times,unsigned char* signal,int length,int orderi,float* evals);
 	
 		void update(int modelOrder);
-		void print(bool verbose=true);
+		void print(int order);
 
 		int save(FILE* file,bool lossy = false);
 		int load(FILE* file);
@@ -58,7 +58,7 @@ class CFrelement
 		float gain;
 		char id[MAX_ID_LENGTH];
 		SFrelement frelements[NUM_PERIODICITIES];
-		int measurements,order;
+		int measurements;
 		int64_t firstTime;
 		int64_t  lastTime;
 };

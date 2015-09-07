@@ -50,7 +50,7 @@ class CFrelementSet
 		bool update(const char* name,int order);
 
 		/*print model info*/
-		bool print(int verbosityLevel);
+		bool print(int order);
 
 		/*load the model from a file*/
 		bool load(FILE* file);

@@ -17,7 +17,6 @@ CFrelement::CFrelement(const char* name)
 	for (int i=0;i<NUM_PERIODICITIES;i++) frelements[i].amplitude = frelements[i].phase = 0; 
 	for (int i=0;i<NUM_PERIODICITIES;i++) frelements[i].period = (7*24*3600)/(i+1); 
 	gain = 0.5;
-	order = 0;
 	firstTime = -1;
 	lastTime = -1;
 	measurements = 0;
@@ -143,16 +142,14 @@ void CFrelement::update(int modelOrder)
 }
 
 /*text representation of the fremen model*/
-void CFrelement::print(bool verbose)
+void CFrelement::print(int orderi)
 {
 	int errs = 0;
 	std::cout << "Model: " << id << " Prior: " << gain << " Size: " << measurements << " ";
-	if (order > 0) std::cout  << endl;
-	if (verbose){
-		float ampl = gain;
-		for (int i = 0;i<order;i++){
-			std::cout << "Frelement " << i << " " << frelements[i].amplitude << " " << frelements[i].phase << " " << frelements[i].period << endl;
-		}
+	if (orderi > 0) std::cout  << endl;
+	float ampl = gain;
+	for (int i = 0;i<orderi;i++){
+		std::cout << "Frelement " << i << " " << frelements[i].amplitude << " " << frelements[i].phase << " " << frelements[i].period << endl;
 	}
 	std::cout << endl; 
 }

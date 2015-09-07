@@ -87,9 +87,9 @@ bool CFrelementSet::update(const char* name,int order)
 	return true;
 }
 
-bool CFrelementSet::print(int verbosityLevel)
+bool CFrelementSet::print(int order)
 {
-	for (int i = 0;i<numFrelements;i++) frelements[i]->print();
+	for (int i = 0;i<numFrelements;i++) frelements[i]->print(order);
 }
 
 bool CFrelementSet::load(FILE* file)
