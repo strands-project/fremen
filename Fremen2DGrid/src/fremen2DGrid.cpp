@@ -98,7 +98,7 @@ void actionServerCallback(const fremen2dgrid::Fremen2DGridGoalConstPtr& goal, Se
 		float errors[goal->order+1];
 		int resultCode = grids->evaluate(goal->mapName.c_str(),goal->time,mapPtr,goal->order,errors);
 		if (resultCode >= 0){
-			mess << "Predicted the state of " << goal->mapName << " for time " << goal->time << " using FreMEn order " << goal->order;
+			mess << "Evaluated the predictability of " << goal->mapName << " for time " << goal->time << " using FreMEn orders 0 to " << goal->order;
 			result.message = mess.str();
 			server->setSucceeded(result);
 		}else{
@@ -170,13 +170,18 @@ void mapCallback(const nav_msgs::OccupancyGrid &msg)
 {
 	int8_t *data = (int8_t*) msg.data.data();
 	//grids->add(msg.header.frame_id.c_str(),msg.info.map_load_time.sec,(nav_msgs::OccupancyGrid*)&msg);
-	int result = grids->add(mapName,testTime,(nav_msgs::OccupancyGrid*)&msg);
-	if (result ==  0) printf("Map %s updated with info from %i\n",mapName,testTime);
-	if (result ==  1) printf("New map %s created from time %i\n",mapName,testTime);
-	if (result == -1) printf("Map %s dimension mismatch\n",mapName); 
-	if (result >= 0) predictedMap = msg;
+	float errors[5];
+	int bestO = grids->evaluate(mapName,testTime,(nav_msgs::OccupancyGrid*)&msg,4,errors);
+	printf("Best model %i %f\n",bestO,errors[bestO]);
+	if (errors[bestO] < 0.015){ //0.03 without recency
+		int result = grids->add(mapName,testTime,(nav_msgs::OccupancyGrid*)&msg);
+		if (result ==  0) printf("Map %s updated with info from %i\n",mapName,testTime);
+		if (result ==  1) printf("New map %s created from time %i\n",mapName,testTime);
+		if (result == -1) printf("Map %s dimension mismatch\n",mapName); 
+		if (result >= 0) predictedMap = msg;
+		grids->estimate(mapName,testTime,&predictedMap,0);
+	}
 	pubMap.publish(predictedMap);
-	testTime += 1800;
 }
 
 void nameCallback(const std_msgs::String &msg)
@@ -184,10 +189,15 @@ void nameCallback(const std_msgs::String &msg)
 	strcpy(mapName,msg.data.c_str());
 }
 
-void timeCallback(const std_msgs::Int64 &msg)
+void predictTimeCallback(const std_msgs::Int64 &msg)
 {
-	grids->estimate(mapName,(int32_t)msg.data,&predictedMap,1);
+	grids->estimate(mapName,(int32_t)msg.data,&predictedMap,4);
 	pubMap.publish(predictedMap);
+}
+
+void addTimeCallback(const std_msgs::Int64 &msg)
+{
+	testTime = (int32_t)msg.data;
 }
 
 int main(int argc,char* argv[])
@@ -200,7 +210,8 @@ int main(int argc,char* argv[])
 	for (int i=0;i<NUM_PERIODICITIES;i++) periods[i] = (24*3600)/(i+1); 
 	grids = new CFrelement2DGridSet();
 	ros::Subscriber subMap = n->subscribe("/map", 1, mapCallback);
-	ros::Subscriber subTime = n->subscribe("/predictTime", 1, timeCallback);
+	ros::Subscriber subPredTime = n->subscribe("/predictTime", 1, predictTimeCallback);
+	ros::Subscriber subAddTime = n->subscribe("/addTime", 1, addTimeCallback);
 	ros::Subscriber subName = n->subscribe("/mapName", 1, nameCallback);
 	pubMap = n->advertise<nav_msgs::OccupancyGrid>("/predictedMap", 1);
 

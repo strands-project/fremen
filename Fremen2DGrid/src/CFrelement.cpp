@@ -15,6 +15,7 @@ CFrelement::CFrelement()
 	frelements = NULL; 
 	components = NULL; 
 	gain = 0.5;
+	lastMeasurement = 0.5;
 	firstTime = -1;
 	lastTime = -1;
 	measurements = 0;
@@ -45,7 +46,7 @@ int CFrelement::add(uint32_t times[],float states[],int length)
 	//verify if there is an actual update
 	if (numUpdated <= 0)return numUpdated;
 	lastTime = times[length-1];
-
+	lastMeasurement = states[length-1];
 	//update the gains accordingly 
 	float oldGain=0;
 	float newGain=0;
@@ -178,6 +179,7 @@ int CFrelement::estimate(uint32_t times[],float probs[],int length,int orderi)
 		time = times[j];
 		estimate = gain;
 		for (int i = 0;i<order;i++) estimate+=2*frelements[i].amplitude*cos(time/frelements[i].period*2*M_PI-frelements[i].phase);
+		estimate+=(lastMeasurement-estimate)*exp(-(float)fabs(time-lastTime)/3600);
 		if (estimate > 1.0 - SATURATION) estimate =  1.0 - SATURATION;
 		if (estimate < 0.0 + SATURATION) estimate =  0.0 + SATURATION;
 		probs[j]=estimate;

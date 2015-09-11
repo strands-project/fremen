@@ -90,12 +90,28 @@ int CFrelement2DGrid::estimateEntropy(uint32_t time,int8_t states[],int order)
 //not functional!
 int CFrelement2DGrid::evaluate(uint32_t time,int8_t states[],int order,float errs[])
 {
+	for (int i = 0;i<=order;i++) errs[i] = 0;
+	float evals[order+1];
+	int numEvaluated = 0;
 	for (int i = 0;i<numFrelements;i++)
 	{
-		if (states[i] != -1){
-			if (frelementArray[i] == NULL) frelementArray[i] = new CFrelement();
+		if (states[i] != -1 && frelementArray[i] != NULL)
+		{
 			float signal = ((float)states[i])/100.0;
-			frelementArray[i]->add(&time,&signal,1);
+			frelementArray[i]->evaluate(&time,&signal,1,order,evals);
+			for (int i = 0;i<=order;i++) errs[i] += evals[i];
+			numEvaluated++;
+		}
+	}
+	if (numEvaluated > 0) for (int i = 0;i<=order;i++) errs[i]=errs[i]/numEvaluated;
+	
+	int index = 0;
+	float minError = 100000;
+	for (int i = 0;i<=order;i++){
+	       	if (errs[i]<minError)
+		{
+			index = i;	
+			minError = errs[i];	
 		}
 	}
 	return 0;

@@ -69,6 +69,7 @@ class CFrelement
 		unsigned char order;
 		int64_t firstTime;
 		int64_t  lastTime;
+		float lastMeasurement;
 };
 
 #endif
