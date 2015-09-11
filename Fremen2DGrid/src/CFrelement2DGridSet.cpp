@@ -38,26 +38,25 @@ bool CFrelement2DGridSet::find(const char *name)
 int CFrelement2DGridSet::estimate(const char *name,uint32_t time,nav_msgs::OccupancyGrid *map,int order)
 {
 	if (find(name) == false)return -1;
-	//printf("Estimate %i %s \n",activeIndex,active->id);
 	return active->estimate(time,map->data.data(),order);
 }
 
-/*
-int CFrelement2DGridSet::evaluate(const char *name,uint32_t times[],unsigned char states[],int length,int order,float errors[])
-{
-	if (find(name) == false) return -1;
-	return active->evaluate(times,states,length,order,errors);;
-}
-
-
-
-int CFrelement2DGridSet::estimateEntropy(const char *name,uint32_t times[],float entropy[],int length,int order)
+int CFrelement2DGridSet::estimateEntropy(const char *name,uint32_t time,nav_msgs::OccupancyGrid *map,int order)
 {
 	if (find(name) == false)return -1;
-	return active->estimateEntropy(times,entropy,length,order);
+	return active->estimateEntropy(time,map->data.data(),order);
 }
 
+int CFrelement2DGridSet::evaluate(const char *name,uint32_t time,nav_msgs::OccupancyGrid *map,int order,float errors[])
+{
+	if (find(name) == false) return -1;
+	return active->evaluate(time,map->data.data(),order,errors);;
+}
 
+int CFrelement2DGridSet::print()
+{
+	for (int i =0;i<numGrids;i++) printf("Map %s is %ix%i\n",grids[i]->id,grids[i]->width,grids[i]->height);
+}
 
 int CFrelement2DGridSet::remove(const char *name)
 {
@@ -65,4 +64,4 @@ int CFrelement2DGridSet::remove(const char *name)
 	delete grids[activeIndex];
 	grids[activeIndex] = grids[--numGrids];
 	return numGrids+1;
-}*/
+}

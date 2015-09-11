@@ -83,6 +83,10 @@ int CFrelement::add(uint32_t times[],float states[],int length)
 
 int CFrelement::update(unsigned char orderi)
 {
+	if (gain == 0 || measurements == 0){
+	       	order = 0;
+		return 0;
+	}
 	if (orderi != order)
 	{
 		order = orderi;
@@ -114,6 +118,7 @@ int CFrelement::update(unsigned char orderi)
 			}
 		}
 	}
+	return 0;
 }
 
 int CFrelement::evaluate(uint32_t times[], float signal[],int length,int orderi,float evals[])
@@ -122,24 +127,24 @@ int CFrelement::evaluate(uint32_t times[], float signal[],int length,int orderi,
 	float estimate = 0;
 	float time;
 	float state;
-	for (int j = 0;j<=orderi;j++) evals[j] = 0;
+	for (int j = 0;j<=order;j++) evals[j] = 0;
 	for (int j = 0;j<length;j++)
 	{
 		time = times[j];
 		state = signal[j];
 		estimate = gain;
 		evals[0]+= fabs(state-estimate);
-		for (int i = 0;i<orderi;i++){
+		for (int i = 0;i<order;i++){
 			 estimate+=2*frelements[i].amplitude*cos(time/frelements[i].period*2*M_PI-frelements[i].phase);
 			 evals[i+1]+= fabs(state-estimate);
 		}
 	}
-	for (int j = 0;j<=orderi;j++)evals[j]=evals[j]/length;
+	for (int j = 0;j<=order;j++)evals[j]=evals[j]/length;
 
 	//get best model order
 	float error = 10.0;
 	int index = 0;
-	for (int j = 0;j<=orderi;j++)
+	for (int j = 0;j<=order;j++)
 	{
 		if (evals[j] < error-0.001){
 			index = j;
@@ -155,9 +160,9 @@ void CFrelement::print(int orderi)
 	update(orderi);
 	int errs = 0;
 	std::cout << " Prior: " << gain << " Size: " << measurements << " ";
-	if (orderi > 0) std::cout  << endl;
+	if (order > 0) std::cout  << endl;
 	float ampl = gain;
-	for (int i = 0;i<orderi;i++){
+	for (int i = 0;i<order;i++){
 		std::cout << "Frelement " << i << " " << frelements[i].amplitude << " " << frelements[i].phase << " " << frelements[i].period << endl;
 	}
 	std::cout << endl; 
@@ -172,7 +177,7 @@ int CFrelement::estimate(uint32_t times[],float probs[],int length,int orderi)
 	{
 		time = times[j];
 		estimate = gain;
-		for (int i = 0;i<orderi;i++) estimate+=2*frelements[i].amplitude*cos(time/frelements[i].period*2*M_PI-frelements[i].phase);
+		for (int i = 0;i<order;i++) estimate+=2*frelements[i].amplitude*cos(time/frelements[i].period*2*M_PI-frelements[i].phase);
 		if (estimate > 1.0 - SATURATION) estimate =  1.0 - SATURATION;
 		if (estimate < 0.0 + SATURATION) estimate =  0.0 + SATURATION;
 		probs[j]=estimate;
@@ -189,7 +194,7 @@ int CFrelement::estimateEntropy(uint32_t times[],float entropy[],int length,int 
 	{
 		time = times[j];
 		estimate = gain;
-		for (int i = 0;i<orderi;i++) estimate+=2*frelements[i].amplitude*cos(time/frelements[i].period*2*M_PI-frelements[i].phase);
+		for (int i = 0;i<order;i++) estimate+=2*frelements[i].amplitude*cos(time/frelements[i].period*2*M_PI-frelements[i].phase);
 		if (estimate <= 0 || estimate >= 1) entropy[j] = 0; else  entropy[j] = -(estimate*log2f(estimate)+(1-estimate)*log2f((1-estimate)));
 	}
 	return length;

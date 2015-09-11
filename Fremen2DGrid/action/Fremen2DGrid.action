@@ -6,7 +6,7 @@ string   operation 	#the operation can be 'add', 'predict', 'entropy', 'evaluate
 			#'evaluate' predicts the state for the given times, compares the prediction with ground truth and returns the prediction errors for model orders from 0 to the order specified. Meant to help to decide which order to use for the 'predict' action. 
 
 uint32   time 		#the time instants for the 'predict', 'add', 'entropy' and 'evaluate' actions
-string 	 name
+string 	 mapName 
 nav_msgs/OccupancyGrid map 
 
 #specific for the 'predict', 'evaluate' and 'entropy actions
