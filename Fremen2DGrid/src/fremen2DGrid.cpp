@@ -26,6 +26,7 @@ bool stop = false;
 CFrelement2DGrid *gridA;
 CFrelement2DGrid *gridB;
 ros::Publisher pubMap;
+int predictOrder = 2;
 
 CFrelement2DGridSet* grids; 
 nav_msgs::OccupancyGrid predictedMap;
@@ -173,7 +174,7 @@ void mapCallback(const nav_msgs::OccupancyGrid &msg)
 	float errors[5];
 	int bestO = grids->evaluate(mapName,testTime,(nav_msgs::OccupancyGrid*)&msg,4,errors);
 	printf("Best model %i %f\n",bestO,errors[bestO]);
-	if (errors[bestO] < 0.015){ //0.03 without recency
+	if (errors[bestO] < 0.025){ //0.03 without recency
 		int result = grids->add(mapName,testTime,(nav_msgs::OccupancyGrid*)&msg);
 		if (result ==  0) printf("Map %s updated with info from %i\n",mapName,testTime);
 		if (result ==  1) printf("New map %s created from time %i\n",mapName,testTime);
@@ -191,8 +192,18 @@ void nameCallback(const std_msgs::String &msg)
 
 void predictTimeCallback(const std_msgs::Int64 &msg)
 {
-	grids->estimate(mapName,(int32_t)msg.data,&predictedMap,4);
+	grids->estimate(mapName,(int32_t)msg.data,&predictedMap,predictOrder);
 	pubMap.publish(predictedMap);
+}
+
+void predictOrderCallback(const std_msgs::Int64 &msg)
+{
+	predictOrder = (int)msg.data;
+}
+
+void mapSaveCallback(const std_msgs::String &msg)
+{
+	grids->save(mapName,msg.data.c_str());
 }
 
 void addTimeCallback(const std_msgs::Int64 &msg)
@@ -209,10 +220,14 @@ int main(int argc,char* argv[])
 	periods = (float*)calloc(NUM_PERIODICITIES,sizeof(float));
 	for (int i=0;i<NUM_PERIODICITIES;i++) periods[i] = (24*3600)/(i+1); 
 	grids = new CFrelement2DGridSet();
+	strcpy(mapName,"default");
+	if (argc > 1) grids->load(mapName,argv[1]); 
 	ros::Subscriber subMap = n->subscribe("/map", 1, mapCallback);
 	ros::Subscriber subPredTime = n->subscribe("/predictTime", 1, predictTimeCallback);
+	ros::Subscriber subPredOrder = n->subscribe("/predictOrder", 1, predictOrderCallback);
 	ros::Subscriber subAddTime = n->subscribe("/addTime", 1, addTimeCallback);
 	ros::Subscriber subName = n->subscribe("/mapName", 1, nameCallback);
+	ros::Subscriber subSAve = n->subscribe("/mapSave", 1, mapSaveCallback);
 	pubMap = n->advertise<nav_msgs::OccupancyGrid>("/predictedMap", 1);
 
 	while (ros::ok()){

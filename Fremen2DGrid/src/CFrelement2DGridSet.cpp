@@ -65,3 +65,22 @@ int CFrelement2DGridSet::remove(const char *name)
 	grids[activeIndex] = grids[--numGrids];
 	return numGrids+1;
 }
+
+int CFrelement2DGridSet::save(const char *name,const char *filename)
+{
+	if (find(name) == false) return -1;
+	active->save(filename);
+	return numGrids;
+}
+
+int CFrelement2DGridSet::load(const char *name,const char *filename)
+{
+	bool exists = find(name);
+	if (exists == false){
+		grids[numGrids++] = new CFrelement2DGrid(name);
+		activeIndex = numGrids-1;
+		active = grids[numGrids-1];
+	}
+	active->load(filename);
+	return numGrids;
+}

@@ -46,6 +46,8 @@ class CFrelement2DGridSet
 		/*remove states from the collection
 		  return the number of remaining states*/
 		int remove(const char *name);
+		int save(const char *name,const char* filename);
+		int load(const char *name,const char* filename);
 	
 		int print();
 

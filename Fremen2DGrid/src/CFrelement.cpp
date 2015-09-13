@@ -101,7 +101,7 @@ int CFrelement::update(unsigned char orderi)
 			{
 				re = components[i].realStates-components[i].realBalance;
 				im = components[i].imagStates-components[i].imagBalance;
-				if (1.5*periods[i] <= duration) freq[i].amplitude = sqrt(re*re+im*im)/measurements; else freq[i].amplitude = 0;
+				if (periods[i] <= duration) freq[i].amplitude = sqrt(re*re+im*im)/measurements; else freq[i].amplitude = 0;
 				if (freq[i].amplitude < FREMEN_AMPLITUDE_THRESHOLD) freq[i].amplitude = 0;
 				freq[i].phase = atan2(im,re);
 				freq[i].period = periods[i];
