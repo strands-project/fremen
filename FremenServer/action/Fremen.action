@@ -1,6 +1,7 @@
 #goal definition
-string   operation 	#the operation can be 'add', 'predict', 'forecast', 'entropy', 'evaluate', 'update' and 'delete'
+string   operation 	#the operation can be 'add', 'addvalues', 'predict', 'forecast', 'entropy', 'evaluate', 'update' and 'delete'
 			#'add' adds a sequence of given (by ID) state measurements and the times these have been obtained to the state's model, if ID is given for the first time, a new state is created and added to the model
+			#'addvalues' adds a sequence of given (by ID) value measurements and the times these have been obtained to the state's model, if ID is given for the first time, a new state is created and added to the model
 			#'predict'  calculates a sequence of probabilities of the state ID for the given times (i.e. prediction of one state for multiple time instants)
 			#'forecast'  calculates a sequence of probabilities of the states with given 'ids' for the given time (i.e. prediction of mutiple states for a single time instant)
 			#'entropy'  calculates a sequence of entropies of the state ID for the given times - this is to support exploration
@@ -19,7 +20,8 @@ int32    order 		#number of periodic processes to use for the purpose of predict
 int32[]  orders	  	#same as previous one, but for all states in the **ids** 
 
 #specific for the 'add' and 'evaluate' action
-bool[]   states   	#sequence of states observed at the particular times - specific to the 'add' action
+bool[]      states   	#sequence of states observed at the particular times - specific to the 'add' action 	(this is for backward compatibility)
+float32[]   values   	#sequence of values observed at the particular times - specific to the 'addvalues' action, (I recommend to normalize the values so they fit 0-1)
 
 ---
 #result definition

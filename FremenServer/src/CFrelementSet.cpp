@@ -14,7 +14,7 @@ CFrelementSet::~CFrelementSet()
 	for (int i=0;i<numFrelements;i++) delete frelements[i];
 }
 
-int CFrelementSet::add(const char *name,uint32_t times[],unsigned char states[],int length)
+int CFrelementSet::add(const char *name,uint32_t times[],float states[],int length)
 {
 	bool exists = find(name);
 	if (exists == false){
