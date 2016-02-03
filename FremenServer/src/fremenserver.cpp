@@ -79,7 +79,7 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 	}
 	else if (goal->operation == "addvalues")
 	{
-		if (goal->times.size() == goal->states.size()){
+		if (goal->times.size() == goal->values.size()){
 			result.success = frelements.add(goal->id.c_str(),(uint32_t*)goal->times.data(),(float*)goal->values.data(),(int)goal->states.size());
 			if (result.success >=0)
 			{
@@ -91,7 +91,7 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			}
 			server->setSucceeded(result);
 		}else{
-			mess << "The length of the 'states' and 'times' arrays does not match.";
+			mess << "The length of the 'values' and 'times' arrays does not match.";
 			result.message = mess.str(); 
 			result.success = -2;
 			server->setAborted(result);
