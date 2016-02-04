@@ -25,19 +25,18 @@ class CFrelement2DGrid
 		  - returns the number of stored grids*/
 		int add(uint32_t time,int8_t states[],int width,int height,float originX,float originY,float resolution);
 
-		/*returns the occupancy probabilities for the given time with a given order 
+		/*estimates the occupancy probabilities [0..100] for the given time with a given order 
 		  returns the number of predicted cells*/
 		int estimate(uint32_t time,int8_t states[],int order);
 
-		/*estimate entropies of the given state for the given times - the entropy array is an output
-		  returns false if the state with the given ID is not present in the collection
-		  otherwise returns true and fills the probs array with the calculated predictions*/
-		int estimateEntropy(uint32_t time,float entropy[],int order);
+		/*estimates the occupancy entropies [0..100] for the given time with a given order 
+		  returns the number of cells*/
+		int estimateEntropy(uint32_t time,int8_t entropy[],int order);
 
-		/*evaluate the prediction/estimation for the given states and times
+		/*evaluate the prediction/estimation for the given time
 		  returns -1 if the state with the given ID is not present in the collection
 		  otherwise returns the best performing model order and the errors in the eval array*/
-		int evaluate(const char *name,uint32_t times[],unsigned char probs[],int length,int order,float eval[]);
+		int evaluate(uint32_t time,int8_t states[],int order,float []);
 
 		/*print grid info*/
 		bool print(int order);
@@ -51,9 +50,8 @@ class CFrelement2DGrid
 		/*idecko voe*/
 		char id[255];
 
-	private:
-		CFrelement** frelementArray;
 		int numFrelements;
+		CFrelement** frelementArray;
 		int width;
 		int height;
 		float resolution;

@@ -36,7 +36,7 @@ class CFrelement
 		~CFrelement();
 
 		//adds a serie of measurements to the data
-		int add(uint32_t times[],unsigned char states[],int length);
+		int add(uint32_t times[],float states[],int length);
 
 		//estimates the probability for the given times 
 		int estimate(uint32_t times[],float probs[],int length,int order);

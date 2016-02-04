@@ -6,11 +6,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp genmsg actionlib_msgs actionlib n
 
 set ( CMAKE_CXX_FLAGS "-Ofast -march=native -mno-avx -ggdb")
 
-add_message_files(
-  DIRECTORY msg 
-  FILES AddMap.msg
-)
-
 add_action_files(
   DIRECTORY action
   FILES Fremen2DGrid.action

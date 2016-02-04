@@ -22,11 +22,11 @@ uint32_t testTime = 0;
 CFrelement *frelementArray = NULL;
 float *values = NULL;
 uint32_t times[1];
-int numStates = 0;
 bool stop = false;
 CFrelement2DGrid *gridA;
 CFrelement2DGrid *gridB;
 ros::Publisher pubMap;
+int predictOrder = 2;
 
 CFrelement2DGridSet* grids; 
 nav_msgs::OccupancyGrid predictedMap;
@@ -48,97 +48,69 @@ void actionServerCallback(const fremen2dgrid::Fremen2DGridGoalConstPtr& goal, Se
 //	if (debug) ROS_DEBUG("Command received %s %s\n",goal->operation.c_str(),goal->id.c_str());
 
 	times[0] = goal->time;
-/*	if (goal->operation == "add")
+	nav_msgs::OccupancyGrid *mapPtr = (nav_msgs::OccupancyGrid*)&goal->map;
+	if (goal->operation == "add")
 	{
-		numStates = goal->states.size();
-		frelementArray =  new CFrelement[numStates]; 
-		values =  (float*) malloc(sizeof(float)*numStates);
-		if (numStates == goal->states.size())
-		{
-			int addedStates = 0;
-			for (int i = 0;i<numStates;i++){
-				if (goal->states[i] != -1){
-					values[0] = 0.01*goal->states[i];
-					addedStates+=frelementArray[i].add(times,values,1);
-				}
-			}
-			mess << "Added " << addedStates << " states measured at time " << goal->time << "."; 
+		int resultCode = grids->add(goal->mapName.c_str(),goal->time,mapPtr);
+		if (resultCode == 1){
+			mess << "New map " << goal->mapName << " was added to the map collection.";
 			result.message = mess.str(); 
 			server->setSucceeded(result);
-		}else{
-			mess << "The length of the 'states' (" << goal->states.size() << ") array does not match the previous size (" << numStates << ").";
+		}
+		else if (resultCode == 0){
+			mess << "Map " << goal->mapName << " was updated with measurement from time " << goal->time << ".";
 			result.message = mess.str(); 
-			result.success = -1;
+			server->setSucceeded(result);
+		}
+		else if (resultCode == -1){
+			mess << "Map " << goal->mapName << " has different resolution or dimensions that the one you want to add.";
+			result.message = mess.str(); 
 			server->setAborted(result);
 		}
 	}
-	*/
-/*	else if (goal->operation == "predict")
+	else if (goal->operation == "predict")
 	{
-			for (int i = 0;i<numStates;i++){
-			       	frelementArray[i].estimate(times,&values[i],1,goal->order);
-				values[i] = (int)(values[i]*100);
-			}
-			mess << "Performed " << (int)numStates << " predictions for time " << times[0] << " with FreMEn order " << goal->order;
-			result.probabilities.assign(values,values + (int)numStates);
+		int resultCode = grids->estimate(goal->mapName.c_str(),goal->time,mapPtr,goal->order);
+		if (resultCode >= 0){
+			mess << "Predicted the state of " << goal->mapName << " for time " << goal->time << " using FreMEn order " << goal->order;
 			result.message = mess.str();
-			result.success = 0;
 			server->setSucceeded(result);
+		}else{
+			mess << "Map " << goal->mapName << " was not in the map collection ";
+			result.message = mess.str(); 
+			server->setAborted(result);
+		}
 	}
 	else if (goal->operation == "entropy")
 	{
-			for (int i = 0;i<numStates;i++) frelementArray[i].estimateEntropy(times,&values[i],1,goal->order);
-			mess << "Performed " << (int)numStates << " entropy predictions for time " << times[0] << " with FreMEn order " << goal->order;
-			result.entropies.assign(values,values + (int)numStates);
+		int resultCode = grids->estimateEntropy(goal->mapName.c_str(),goal->time,mapPtr,goal->order);
+		if (resultCode >= 0){
+			mess << "Predicted the uncertainty (entropy) of " << goal->mapName << " for time " << goal->time << " using FreMEn order " << goal->order;
 			result.message = mess.str();
-			result.success = 0;
 			server->setSucceeded(result);
+		}else{
+			mess << "Map " << goal->mapName << " was not in the map collection ";
+			result.message = mess.str(); 
+			server->setAborted(result);
+		}
 	}
 	else if (goal->operation == "evaluate")
 	{
 		float errors[goal->order+1];
-		float tmpErrors[goal->order+1];
-		float states[1];
-		if (numStates == goal->states.size())
-		{
-			for (int j = 0;j<=goal->order;j++) errors[j]=0;
-			int addedStates = 0;
-			for (int i = 0;i<numStates;i++)
-			{
-				if (goal->states[i] != -1){
-					states[0] = 0.01*goal->states[i];
-					addedStates++;
-					frelementArray[i].evaluate(times,states,1,goal->order,tmpErrors);
-					for (int j = 0;j<=goal->order;j++)errors[j]+=tmpErrors[j];
-				}
-			}
-			for (int j = 0;j<=goal->order;j++) errors[j]=errors[j]/addedStates;
-			
-			//get best model order
-			float error = 10.0;
-			int index = 0;
-			for (int j = 0;j<=goal->order;j++)
-			{
-				if (errors[j] < error-0.001){
-					index = j;
-					error = errors[j]; 
-				}
-			}
-			result.success = index;
-			mess << "Performed " <<  (goal->order+1) << " evaluations of each of "  << addedStates << " states to their ground truth values. The best performing model has order " << result.success;
+		int resultCode = grids->evaluate(goal->mapName.c_str(),goal->time,mapPtr,goal->order,errors);
+		if (resultCode >= 0){
+			mess << "Evaluated the predictability of " << goal->mapName << " for time " << goal->time << " using FreMEn orders 0 to " << goal->order;
 			result.message = mess.str();
-			result.errors.assign(errors,errors + goal->order+1);
 			server->setSucceeded(result);
 		}else{
-			mess << "The length of the 'states' (" << goal->states.size() << ") array does not match the previous size (" << numStates << ").";
+			mess << "Map " << goal->mapName << " was not in the map collection ";
 			result.message = mess.str(); 
-			result.success = -1;
 			server->setAborted(result);
 		}
 	}
 	else if (goal->operation == "print")
 	{
-		for (int i = 0;i<numStates;i++) frelementArray[i].print(goal->order);
+		grids->print();
 		result.success = true;
 		result.message = "Debug printed";
 		server->setSucceeded(result);
@@ -148,7 +120,7 @@ void actionServerCallback(const fremen2dgrid::Fremen2DGridGoalConstPtr& goal, Se
 		result.success = false;		
 		result.message = "Unknown action requested";
 		server->setAborted(result);
-	}*/
+	}
 }
 
 int test()
@@ -199,11 +171,18 @@ void mapCallback(const nav_msgs::OccupancyGrid &msg)
 {
 	int8_t *data = (int8_t*) msg.data.data();
 	//grids->add(msg.header.frame_id.c_str(),msg.info.map_load_time.sec,(nav_msgs::OccupancyGrid*)&msg);
-	int result = grids->add(mapName,testTime,(nav_msgs::OccupancyGrid*)&msg);
-	if (result == 0) printf("Map %s updated with info from %i\n",mapName,testTime); else printf("New map %s created from time %i\n",mapName,testTime);
-	predictedMap = msg;
+	float errors[5];
+	int bestO = grids->evaluate(mapName,testTime,(nav_msgs::OccupancyGrid*)&msg,4,errors);
+	printf("Best model %i %f\n",bestO,errors[bestO]);
+	if (errors[bestO] < 0.025){ //0.03 without recency
+		int result = grids->add(mapName,testTime,(nav_msgs::OccupancyGrid*)&msg);
+		if (result ==  0) printf("Map %s updated with info from %i\n",mapName,testTime);
+		if (result ==  1) printf("New map %s created from time %i\n",mapName,testTime);
+		if (result == -1) printf("Map %s dimension mismatch\n",mapName); 
+		if (result >= 0) predictedMap = msg;
+		grids->estimate(mapName,testTime,&predictedMap,0);
+	}
 	pubMap.publish(predictedMap);
-	testTime += 1800;
 }
 
 void nameCallback(const std_msgs::String &msg)
@@ -211,10 +190,25 @@ void nameCallback(const std_msgs::String &msg)
 	strcpy(mapName,msg.data.c_str());
 }
 
-void timeCallback(const std_msgs::Int64 &msg)
+void predictTimeCallback(const std_msgs::Int64 &msg)
 {
-	grids->estimate(mapName,(int32_t)msg.data,&predictedMap,1);
+	grids->estimate(mapName,(int32_t)msg.data,&predictedMap,predictOrder);
 	pubMap.publish(predictedMap);
+}
+
+void predictOrderCallback(const std_msgs::Int64 &msg)
+{
+	predictOrder = (int)msg.data;
+}
+
+void mapSaveCallback(const std_msgs::String &msg)
+{
+	grids->save(mapName,msg.data.c_str());
+}
+
+void addTimeCallback(const std_msgs::Int64 &msg)
+{
+	testTime = (int32_t)msg.data;
 }
 
 int main(int argc,char* argv[])
@@ -226,9 +220,14 @@ int main(int argc,char* argv[])
 	periods = (float*)calloc(NUM_PERIODICITIES,sizeof(float));
 	for (int i=0;i<NUM_PERIODICITIES;i++) periods[i] = (24*3600)/(i+1); 
 	grids = new CFrelement2DGridSet();
+	strcpy(mapName,"default");
+	if (argc > 1) grids->load(mapName,argv[1]); 
 	ros::Subscriber subMap = n->subscribe("/map", 1, mapCallback);
-	ros::Subscriber subTime = n->subscribe("/predictTime", 1, timeCallback);
+	ros::Subscriber subPredTime = n->subscribe("/predictTime", 1, predictTimeCallback);
+	ros::Subscriber subPredOrder = n->subscribe("/predictOrder", 1, predictOrderCallback);
+	ros::Subscriber subAddTime = n->subscribe("/addTime", 1, addTimeCallback);
 	ros::Subscriber subName = n->subscribe("/mapName", 1, nameCallback);
+	ros::Subscriber subSAve = n->subscribe("/mapSave", 1, mapSaveCallback);
 	pubMap = n->advertise<nav_msgs::OccupancyGrid>("/predictedMap", 1);
 
 	while (ros::ok()){

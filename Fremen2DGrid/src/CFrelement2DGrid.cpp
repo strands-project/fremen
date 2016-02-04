@@ -29,7 +29,7 @@ CFrelement2DGrid::~CFrelement2DGrid()
 
 int CFrelement2DGrid::add(uint32_t time,int8_t states[],int widthi,int heighti,float originXi,float originYi,float resolutioni)
 {
-	int result = 0;
+	int result = -1;
 	/*is this a new map ? if yes, initialise all stuff*/
 	if (numFrelements == 0)
 	{
@@ -43,13 +43,16 @@ int CFrelement2DGrid::add(uint32_t time,int8_t states[],int widthi,int heighti,f
 		for (int i = 0;i<numFrelements;i++) frelementArray[i] = NULL;
 		result = 1;
 	}
-	for (int i = 0;i<numFrelements;i++)
-	{
-		if (states[i] != -1){
-			if (frelementArray[i] == NULL) frelementArray[i] = new CFrelement();
-			float signal = ((float)states[i])/100.0;
-			frelementArray[i]->add(&time,&signal,1);
+	if (height == heighti && width == widthi && resolution == resolutioni){ 
+		for (int i = 0;i<numFrelements;i++)
+		{
+			if (states[i] != -1){
+				if (frelementArray[i] == NULL) frelementArray[i] = new CFrelement();
+				float signal = ((float)states[i])/100.0;
+				frelementArray[i]->add(&time,&signal,1);
+			}
 		}
+		result = 0;
 	}
 	return result; 
 }
@@ -64,6 +67,51 @@ int CFrelement2DGrid::estimate(uint32_t time,int8_t states[],int order)
 		}else{
 			frelementArray[i]->estimate(&time,&prob,1,order);
 			states[i] = (int8_t)(100.0*prob);
+		}
+	}
+	return 0;
+}
+
+int CFrelement2DGrid::estimateEntropy(uint32_t time,int8_t states[],int order)
+{
+	float prob;
+	for (int i = 0;i<numFrelements;i++)
+	{
+		if (frelementArray[i] == NULL){
+			states[i] = -1;
+		}else{
+			frelementArray[i]->estimateEntropy(&time,&prob,1,order);
+			states[i] = (int8_t)(100.0*prob);
+		}
+	}
+	return 0;
+}
+
+//not functional!
+int CFrelement2DGrid::evaluate(uint32_t time,int8_t states[],int order,float errs[])
+{
+	for (int i = 0;i<=order;i++) errs[i] = 0;
+	float evals[order+1];
+	int numEvaluated = 0;
+	for (int i = 0;i<numFrelements;i++)
+	{
+		if (states[i] != -1 && frelementArray[i] != NULL)
+		{
+			float signal = ((float)states[i])/100.0;
+			frelementArray[i]->evaluate(&time,&signal,1,order,evals);
+			for (int i = 0;i<=order;i++) errs[i] += evals[i];
+			numEvaluated++;
+		}
+	}
+	if (numEvaluated > 0) for (int i = 0;i<=order;i++) errs[i]=errs[i]/numEvaluated;
+	
+	int index = 0;
+	float minError = 100000;
+	for (int i = 0;i<=order;i++){
+	       	if (errs[i]<minError)
+		{
+			index = i;	
+			minError = errs[i];	
 		}
 	}
 	return 0;

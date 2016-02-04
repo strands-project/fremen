@@ -28,29 +28,28 @@ class CFrelement2DGridSet
 		  - returns the the index of the set in the collection*/
 		int add(const char *name,uint32_t time,nav_msgs::OccupancyGrid *map);
 
-		/*estimate probabilities of the given state for the given times - the probs array is an output
+		/*estimate occupancy of the cells for given times 
 		  returns false if the state with the given ID is not present in the collection
-		  otherwise returns true and fills the probs array with the calculated predictions*/
+		  otherwise returns true and fills the map with the calculated predictions*/
 		int estimate(const char *name,uint32_t time,nav_msgs::OccupancyGrid *map,int order);
 
-		/*estimate entropies of the given state for the given times - the entropy array is an output
+		/*estimate occupancy entropy of the cells for given times 
 		  returns false if the state with the given ID is not present in the collection
-		  otherwise returns true and fills the probs array with the calculated predictions*/
-//		int estimateEntropy(const char *name,uint32_t times[],float entropy[],int length,int order);
+		  otherwise returns true and fills the map with the calculated predictions*/
+		int estimateEntropy(const char *name,uint32_t time,nav_msgs::OccupancyGrid *map,int order);
 
-		/*evaluate the prediction/estimation for the given states and times
+		/*evaluate the prediction/estimation for the given times
 		  returns -1 if the state with the given ID is not present in the collection
 		  otherwise returns the best performing model order and the errors in the eval array*/
-//		int evaluate(const char *name,uint32_t times[],unsigned char probs[],int length,int order,float eval[]);
+		int evaluate(const char *name,uint32_t time,nav_msgs::OccupancyGrid *map,int order,float errs[]);
 
 		/*remove states from the collection
 		  return the number of remaining states*/
-//		int remove(const char *name);
-
-		/*remove states from the collection
-		  returns false if the state with the given ID is not present in the collection*/
-//		bool update(const char* name,int order);
-
+		int remove(const char *name);
+		int save(const char *name,const char* filename);
+		int load(const char *name,const char* filename);
+	
+		int print();
 
 		CFrelement2DGrid* active;
 	private:
