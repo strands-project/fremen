@@ -2,6 +2,14 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Towards topometric mapping FreMen
+* First attempt to represent recency
+* Added estimate entropy action
+* ROS-compatible FreMen grid
+* Contributors: Tom Krajnik
+
 0.1.3 (2015-04-08)
 ------------------
 * Minor bug in last added data timestamp removed.

@@ -2,6 +2,16 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Checking length of the correct arrays
+* Extended by adding an 'addvalue' action, which accepts floating points at input. I recommend to normalize the floats to [0-1].
+* Redundand variable 'order' removed from CFrelement
+* View action
+* forecastEntropy action
+* forecastEntropy action
+* Contributors: Tom Krajnik
+
 0.1.3 (2015-04-08)
 ------------------
 * Minor bug in last added data timestamp removed.
