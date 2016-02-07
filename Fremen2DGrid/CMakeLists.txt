@@ -15,7 +15,7 @@ generate_messages(
    DEPENDENCIES actionlib_msgs nav_msgs 
 )
 
-catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs)
+catkin_package(CATKIN_DEPENDS roscpp message_runtime genmsg actionlib_msgs nav_msgs)
 
 include_directories(${catkin_INCLUDE_DIRS}) 
 
