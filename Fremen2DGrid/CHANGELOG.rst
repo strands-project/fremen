@@ -2,8 +2,8 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.1 (2016-02-17)
+------------------
 * added nav_msgs as dependency
   fixes `#21 <https://github.com/strands-project/fremen/issues/21>`_
 * Messing with CMakeLists.txt

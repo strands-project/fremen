@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>fremenserver</name>
-  <version>0.2.0</version>
+  <version>0.2.1</version>
   <description>FremenServer is a tool for prediction of binary states based on non-uniform Fourier Transform. It uses the frequency spectrum analysis to identify reoccuring patterns in temporal sequences of binary states and represents the probability of these states in an analythical form as a combination of harmonic functions. This allows to learn long-term dynamics of the environment and use the learned experience to predict states of the world models used in mobile robotics. This ability is beneficial for tasks like self-localization, object search, path planning, anomaly detection and exploration.</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
