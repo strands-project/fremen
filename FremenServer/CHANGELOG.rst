@@ -2,6 +2,9 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.2.0 (2016-02-04)
 ------------------
 * Checking length of the correct arrays

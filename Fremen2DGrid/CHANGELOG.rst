@@ -2,6 +2,15 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* added nav_msgs as dependency
+  fixes `#21 <https://github.com/strands-project/fremen/issues/21>`_
+* Messing with CMakeLists.txt
+* nav msgs deps added
+* Added missing package to the package.xml
+* Contributors: Marc Hanheide, Tom Krajnik
+
 0.2.0 (2016-02-04)
 ------------------
 * Towards topometric mapping FreMen
