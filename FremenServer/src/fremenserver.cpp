@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include "ros/ros.h"
+#include "std_msgs/Bool.h"
+
 #include "CFrelementSet.h"
 #include <actionlib/server/simple_action_server.h>
 #include <fremenserver/FremenAction.h>
@@ -311,9 +313,15 @@ int main(int argc,char* argv[])
 	server = new Server(*n, "/fremenserver", boost::bind(&actionServerCallback, _1, server), false);
 	server->start();
 
+	ros::Publisher starter_pub = n->advertise<std_msgs::Bool>("/fremenserver_start", 1, true);
+	std_msgs::Bool msg;
+	msg.data=true;
+	starter_pub.publish(msg);
+
 	while (ros::ok()){
 		ros::spinOnce();
 		usleep(30000);
 	}
+
 	return 0;
 }
