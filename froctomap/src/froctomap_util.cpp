@@ -6,6 +6,39 @@
 
 using namespace std;
 
+int generateMaps(const char* name,const char *output,int startTime,int endTime,int interval)
+{
+	/*load the fremen grid*/
+	CFremenGrid *grid = new CFremenGrid(1,1,1);
+	grid->load(name);
+
+	/*prepare output*/
+	long int numTimes = (endTime-startTime)/interval;
+	long int gridSize = grid->numCells;
+	unsigned char* states =  (unsigned char*) malloc(gridSize*numTimes);
+
+	if (states == NULL)
+	{
+		printf("Could not allocate %ld MB of memory.\n",gridSize*numTimes/1024/1024);
+		return -1;
+	}
+
+	/*perform retrieval*/
+	int cnt = 0;
+	for (long int i = 0;i<numTimes;i++){
+		for (long int s = 0;s<gridSize;s++) states[cnt++] = grid->retrieve(s, i*interval);
+		printf("3D Grid %ld of %ld generated !\n",i,numTimes);
+	}
+
+	/*save it*/
+	FILE* file = fopen(output,"w+");
+	fwrite(states,sizeof(unsigned char),gridSize*numTimes,file);
+	fclose(file);
+	printf("File %s saved.\n",output);
+	delete grid;
+	free(states);
+}
+
 int main(int argc,char *argv[])
 {
 	unsigned char *signal = (unsigned char*)malloc(10000000);
@@ -15,6 +48,10 @@ int main(int argc,char *argv[])
 	CTimer timer;
 	timer.start();
 	CFremenGrid grid(1,1,1);
+	if (strcmp(argv[1],"reconstruct")==0)
+	{
+		generateMaps(argv[2],argv[3],atoi(argv[4]),atoi(argv[5]),atoi(argv[6]));
+	}
 	if (strcmp(argv[1],"retrieve")==0){
 		grid.load(argv[2]);
 		grid.reconstruct(atoi(argv[1]),reconstructed);
