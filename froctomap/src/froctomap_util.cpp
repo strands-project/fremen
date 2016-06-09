@@ -24,7 +24,7 @@ int generateMaps(const char* name,const char *output,int startTime,int endTime,i
 	}
 
 	/*perform retrieval*/
-	int cnt = 0;
+	long int cnt = 0;
 	for (long int i = 0;i<numTimes;i++){
 		for (long int s = 0;s<gridSize;s++) states[cnt++] = grid->retrieve(s, i*interval+startTime);
 		printf("3D Grid %ld of %ld generated !\n",i,numTimes);

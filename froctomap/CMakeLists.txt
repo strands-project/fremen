@@ -4,7 +4,7 @@ project(froctomap)
 
 find_package(catkin REQUIRED COMPONENTS  pcl_conversions pcl_ros roscpp rospy std_msgs visualization_msgs geometry_msgs genmsg octomap_server sensor_msgs)
 #set ( CMAKE_CXX_FLAGS "-O3 -march=native")
-set ( CMAKE_CXX_FLAGS "-ggdb")
+set ( CMAKE_CXX_FLAGS "-ggdb -D_FILE_OFFSET_BITS=64" )
 
 
 
