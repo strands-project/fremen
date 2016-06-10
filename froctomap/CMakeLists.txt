@@ -39,6 +39,7 @@ catkin_package()
 add_executable(froctomap src/froctomap.cpp)
 add_executable(convert_raw src/convert_raw.cpp)
 add_executable(froctomap_util src/froctomap_util.cpp)
+add_executable(froctodump_show src/froctodump_show.cpp)
 
 add_dependencies(froctomap ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
 
@@ -55,6 +56,7 @@ target_link_libraries(froctomap froctomap_grid)
 target_link_libraries(froctomap_util froctomap_grid)
 target_link_libraries(convert_raw ${catkin_LIBRARIES})
 target_link_libraries(froctomap ${catkin_LIBRARIES})
+target_link_libraries(froctodump_show ${catkin_LIBRARIES})
 
 #############
 ## Install ##

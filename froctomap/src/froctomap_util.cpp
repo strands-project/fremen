@@ -52,7 +52,7 @@ int main(int argc,char *argv[])
 	{
 		generateMaps(argv[2],argv[3],atoi(argv[4]),atoi(argv[5]),atoi(argv[6]));
 	}
-	if (strcmp(argv[1],"retrieve")==0){
+	else if (strcmp(argv[1],"retrieve")==0){
 		grid.load(argv[2]);
 		grid.reconstruct(atoi(argv[1]),reconstructed);
 		for (int i=0;i<grid.signalLength;i++)printf("%i ",reconstructed[i]);
@@ -81,6 +81,7 @@ int main(int argc,char *argv[])
 	}
 	else
 	{
+		fprintf(stderr,"fremen reconstruct input_grid dump start_time end_time interval\n");
 		fprintf(stderr,"fremen updateOne input_grid cell_index fremen_order output_grid\n");
 		fprintf(stderr,"fremen updateAll input_grid fremen_order output_grid\n");
 		fprintf(stderr,"fremen retrieveOne input_grid cell_index output_grid\n");
