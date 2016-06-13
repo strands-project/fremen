@@ -1,7 +1,7 @@
 
 class TModels(object):
 
-    def __init__(self, name, data_field='data', 
+    def __init__(self, name, data_field='data', data_type='boolean', 
                  timestamp_field='_meta.inserted_at', timestamp_type='datetime',
                  query='{}', db='message_store', collection='message_store'):
         self.name=name
@@ -23,6 +23,14 @@ class TModels(object):
             self.db=data['db']
         if data.has_key('collection'):
             self.collection=data['collection']
+        if data.has_key('timestamp_field'):
+            self.timestamp_field=data['timestamp_field']
+        if data.has_key('timestamp_type'):
+            self.timestamp_type=data['timestamp_type']
+        if data.has_key('data_field'):
+            self.data_field=data['data_field']
+        if data.has_key('data_type'):
+            self.data_type=data['data_type']
     
     def __repr__(self):
         a = dir(self)

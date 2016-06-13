@@ -20,6 +20,14 @@ def load_yaml(filename):
             data=datum
         return data
 
+def get_field(item, key):
+    fields = key.split('.')
+    value=item
+    for i in fields:
+        value = value[i]
+    return value
+
+
 class frongo(object):
 
     def __init__(self, data) :
@@ -44,20 +52,27 @@ class frongo(object):
             self.models.append(val)
 
         for i in self.models:
-            i.epochs = self.get_model_states(i)
+            i.epochs, i.states = self.get_model_states(i)
 
     def get_model_states(self, model):
         epochs=[]
+        states=[]
         db=self.mongo_client[model.db]
         collection=db[model.collection]        
         query = json.loads(model.query)
-        number = collection.find(query).count()
+        #number = collection.find(query).count()
         available = collection.find(query)
         for i in available:
-            epoch = i['_meta']['inserted_at']
+            if model.timestamp_type == 'datetime':
+                #epoch = int(i['_meta']['inserted_at'].strftime('%s'))
+                epoch = int(get_field(i, model.timestamp_field).strftime('%s'))
+            else:
+                epoch = int(get_field(i, model.timestamp_field))
+            state = get_field(i,model.data_field)
+            states.append(state)
             epochs.append(epoch)
-        print number
-        return epochs
+        #print number
+        return epochs, states
         
 
     def _on_node_shutdown(self):
