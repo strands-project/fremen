@@ -1,4 +1,5 @@
 import numpy
+import random
 
 import rospy
 import actionlib
@@ -26,8 +27,19 @@ class fremen_interface(object):
         #samples for result sampling
         index_b = range(int(numpy.ceil(nepochs*0.75)))
         index_e = range(int(numpy.ceil(nepochs*0.75)),nepochs)
+        if not index_e:
+            index_e = random.sample(xrange(nepochs)), 1)
+            
         return index_b, index_e
 
+    def random_sampling(self, nepochs):
+        #samples for result sampling        
+        index_b = sorted(random.sample(xrange(len(epochs)), int(numpy.ceil(len(epochs)*0.8)))) 
+        index_e = []
+        for i in range(len(epochs)):
+            if i not in index_b:
+                index_e.append(i)
+        
 
     def get_build_and_eval_states(self, epochs, states, sampling_type='extrapolation'):
 
@@ -36,12 +48,6 @@ class fremen_interface(object):
         else:
             #random sampling
         
-           #samples for result sampling        
-            index_b = sorted(random.sample(xrange(len(epochs)), int(numpy.ceil(len(epochs)*0.8)))) 
-            index_e = []
-            for i in range(len(epochs)):
-                if i not in index_b:
-                    index_e.append(i)
 
             #samples for time sampling
             tindex_b = sorted(random.sample(xrange(len(tepochs)), int(numpy.ceil(len(tepochs)*0.8)))) 
@@ -63,9 +69,6 @@ class fremen_interface(object):
    
         if not index_e:
             index_e = random.sample(xrange(len(epochs)), 1)
-
-        if not tindex_e:
-            tindex_e = random.sample(xrange(len(tepochs)), 1)
             
         epochs_build = [ epochs[i] for i in index_b]
         epochs_eval = [ epochs[i] for i in index_e]
