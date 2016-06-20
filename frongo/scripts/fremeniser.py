@@ -6,7 +6,10 @@ import json
 import pymongo
 import argparse
 
+import std_msgs
+
 from frongo.temporal_models import *
+from frongo.fremen_interface import *
 
 
 def load_yaml(filename):
@@ -20,60 +23,56 @@ def load_yaml(filename):
             data=datum
         return data
 
-def get_field(item, key):
-    fields = key.split('.')
-    value=item
-    for i in fields:
-        value = value[i]
-    return value
-
 
 class frongo(object):
 
     def __init__(self, data) :
         self.models=[]
-
         rospy.on_shutdown(self._on_node_shutdown)
         host = rospy.get_param("mongodb_host")
         port = rospy.get_param("mongodb_port")
         self.mongo_client = pymongo.MongoClient(host, port)
+
+        # Subscribe to fremen server start topic
+        rospy.Subscriber('/fremenserver_start', std_msgs.msg.Bool, self.fremen_restart_cb)
+        rospy.loginfo("... Done")
+        
         self.create_models(data)
         for i in self.models:
             print i
+
         rospy.loginfo("All Done ...")
         rospy.spin()
-        
+
+
+    """
+     fremen_start_cb
+     
+     This function creates the models when the fremenserver is started
+    """
+    def fremen_restart_cb(self, msg):
+        if msg.data:
+            rospy.logwarn("FREMENSERVER restart detected will generate new models now")
+            #self.create_models()
+
+
     def create_models(self, data):
         print data
         for i in data:
-            print i
             val=TModels(i['model']['name'])
             val._set_props_from_dict(i['model'])
             self.models.append(val)
 
         for i in self.models:
-            i.epochs, i.states = self.get_model_states(i)
+            self.set_model_states(i)
 
-    def get_model_states(self, model):
-        epochs=[]
-        states=[]
+    def set_model_states(self, model):
         db=self.mongo_client[model.db]
         collection=db[model.collection]        
         query = json.loads(model.query)
-        #number = collection.find(query).count()
-        available = collection.find(query)
+        available = collection.find(query)        
         for i in available:
-            if model.timestamp_type == 'datetime':
-                #epoch = int(i['_meta']['inserted_at'].strftime('%s'))
-                epoch = int(get_field(i, model.timestamp_field).strftime('%s'))
-            else:
-                epoch = int(get_field(i, model.timestamp_field))
-            state = get_field(i,model.data_field)
-            states.append(state)
-            epochs.append(epoch)
-        #print number
-        return epochs, states
-        
+            model._add_entry(i)
 
     def _on_node_shutdown(self):
         rospy.loginfo("Shutting Down ...")
