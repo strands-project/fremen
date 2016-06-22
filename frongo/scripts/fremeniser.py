@@ -5,12 +5,14 @@ import yaml
 import json
 import pymongo
 import argparse
+import numpy as np
 
 import std_msgs
 
 from frongo.temporal_models import *
-from frongo.fremen_interface import *
-
+from frongo.graph_models import *
+from frongo.srv import PredictState
+from frongo.srv import GraphModel
 
 def load_yaml(filename):
     data=[]
@@ -33,14 +35,22 @@ class frongo(object):
         port = rospy.get_param("mongodb_port")
         self.mongo_client = pymongo.MongoClient(host, port)
 
-        # Subscribe to fremen server start topic
-        rospy.Subscriber('/fremenserver_start', std_msgs.msg.Bool, self.fremen_restart_cb)
-        rospy.loginfo("... Done")
         
         self.create_models(data)
         for i in self.models:
             print i
 
+        # Subscribe to fremen server start topic
+        rospy.Subscriber('/fremenserver_start', std_msgs.msg.Bool, self.fremen_restart_cb)
+        rospy.loginfo("... Done")
+
+        rospy.sleep(3)
+
+        #Advertise Service
+        self.predict_srv=rospy.Service('/frongo/predict_models', PredictState, self.predict_cb)
+        self.graph_build_srv=rospy.Service('/frongo/graph_model_build', GraphModel, self.graph_model_build_cb)
+        
+        #self.graph_model_construction()
         rospy.loginfo("All Done ...")
         rospy.spin()
 
@@ -53,7 +63,22 @@ class frongo(object):
     def fremen_restart_cb(self, msg):
         if msg.data:
             rospy.logwarn("FREMENSERVER restart detected will generate new models now")
+            for i in self.models:
+                i._create_fremen_models()
+                print i.name, i.order
             #self.create_models()
+
+
+    def predict_cb(self, req):
+        epochs =[]
+        for i in req.epochs:
+            epochs.append(i)
+
+        for i in self.models:
+            if i.name == req.model_name:
+                probs = i._predict_outcome(epochs)
+       
+        return [probs]
 
 
     def create_models(self, data):
@@ -73,6 +98,22 @@ class frongo(object):
         available = collection.find(query)        
         for i in available:
             model._add_entry(i)
+
+    def graph_model_build_cb(self, req):
+        self.graph_model_construction(req)
+        return "Done"        
+
+    def graph_model_construction(self, req):
+        
+        for i in self.models:
+            if req.model_name == i.name:
+                preds=[]
+                graph = graph_model(i.name)
+                ordeps = np.arange(min(i.epochs), max(i.epochs), 3600)
+                ordrange = np.arange(req.from_val, req.until_val+1, req.increment)
+                for j in ordrange.tolist():
+                    preds.append(i._predict_outcome(ordeps.tolist(), order=j))
+                graph.graph_model_construction(i.epochs, i.states, preds, ordeps.tolist())
 
     def _on_node_shutdown(self):
         rospy.loginfo("Shutting Down ...")

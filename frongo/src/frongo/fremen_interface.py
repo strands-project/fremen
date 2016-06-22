@@ -1,5 +1,6 @@
 import numpy
 import random
+import ctypes
 
 import rospy
 import actionlib
@@ -27,57 +28,56 @@ class fremen_interface(object):
         #samples for result sampling
         index_b = range(int(numpy.ceil(nepochs*0.75)))
         index_e = range(int(numpy.ceil(nepochs*0.75)),nepochs)
+        
         if not index_e:
-            index_e = random.sample(xrange(nepochs)), 1)
+            index_e = random.sample(xrange(nepochs), 1)
+
             
         return index_b, index_e
 
     def random_sampling(self, nepochs):
         #samples for result sampling        
-        index_b = sorted(random.sample(xrange(len(epochs)), int(numpy.ceil(len(epochs)*0.8)))) 
+        index_b = sorted(random.sample(xrange(nepochs), int(numpy.ceil(nepochs*0.8)))) 
         index_e = []
-        for i in range(len(epochs)):
+        for i in range(nepochs):
             if i not in index_b:
                 index_e.append(i)
         
+        if not index_e:
+            index_e = random.sample(xrange(nepochs), 1)
+
+            
+        return index_b, index_e
+
 
     def get_build_and_eval_states(self, epochs, states, sampling_type='extrapolation'):
 
         if sampling_type == 'extrapolation':
             index_b, index_e = self.sampling_by_extrapolation(len(epochs))            
         else:
+            index_b, index_e = self.random_sampling(len(epochs))
             #random sampling
-        
 
-            #samples for time sampling
-            tindex_b = sorted(random.sample(xrange(len(tepochs)), int(numpy.ceil(len(tepochs)*0.8)))) 
-            tindex_e = []
-            for i in range(len(tepochs)):
-                if i not in tindex_b:
-                    tindex_e.append(i)        
+        epochs_build = [ epochs[i] for i in index_b]
+        epochs_eval = [ epochs[i] for i in index_e]
+        states_build = [ states[i] for i in index_b]
+        states_eval = [ states[i] for i in index_e]        
         
-        
+        return epochs_build, epochs_eval, states_build, states_eval
+
+
     """
      create_fremen_model
      
      This function creates the fremen model for each door
     """
-    def create_fremen_model(self, name, epochs, states, sampling_type='extrapolation'):
-       
-
-
-   
-        if not index_e:
-            index_e = random.sample(xrange(len(epochs)), 1)
-            
-        epochs_build = [ epochs[i] for i in index_b]
-        epochs_eval = [ epochs[i] for i in index_e]
-        res_build = [ res[i] for i in index_b]
-        res_eval = [ res[i] for i in index_e]
-        
-        to_ret['res']=self.add_and_eval_models(door['model_id']['res'], epochs_build, res_build, epochs_eval, res_eval)
-
-        return to_ret
+    def create_fremen_model(self, name, epochs, states, data_type='boolean', sampling_type='extrapolation'):
+        epochs_build, epochs_eval, states_build, states_eval = self.get_build_and_eval_states(epochs, states, sampling_type)
+        if data_type=='boolean':
+            order=self.add_and_eval_models(name, epochs_build, states_build, epochs_eval, states_eval)
+        else:
+            order=self.add_and_eval_value_models(name, epochs_build, states_build, epochs_eval, states_eval)
+        return order
 
 
     """
@@ -97,7 +97,7 @@ class fremen_interface(object):
         self.FremenClient.send_goal(fremgoal)
         self.FremenClient.wait_for_result()
         ps = self.FremenClient.get_result()
-        #print ps
+        print ps
         
         # print "--- EVALUATE ---"
         frevgoal = fremenserver.msg.FremenGoal()
@@ -110,8 +110,8 @@ class fremen_interface(object):
         self.FremenClient.send_goal(frevgoal)
         self.FremenClient.wait_for_result()
         pse = self.FremenClient.get_result()  
-        #print pse.errors
-        #print "chosen order %d" %pse.errors.index(min(pse.errors))
+        print pse.errors
+        print "chosen order %d" %pse.errors.index(min(pse.errors))
         return pse.errors.index(min(pse.errors))
 
 
@@ -164,6 +164,27 @@ class fremen_interface(object):
         #print "chosen order %d" %pse.errors.index(min(pse.errors))
         return pse.errors.index(min(pse.errors))
 
+
+    def predict_outcome(self, epochs, name, order):
+        #print epoch, mods, ords
+        fremgoal = fremenserver.msg.FremenGoal()
+        fremgoal.operation = 'predict'
+        fremgoal.id = name
+        
+        for i in epochs:
+            fremgoal.times.append(i)
+        
+        fremgoal.order = order
+        #fremgoal.orders = ords
+        
+        self.FremenClient.send_goal(fremgoal)
+        self.FremenClient.wait_for_result(timeout=rospy.Duration(10.0))
+
+#        if self.FremenClient.get_state() == actionlib.GoalStatus.SUCCEEDED:
+        ps = self.FremenClient.get_result()
+        #print ps
+        prob = list(ps.probabilities)
+        return prob
     
 
     def forecast_outcome(self, epoch, mods, ords):

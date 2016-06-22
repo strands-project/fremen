@@ -1,4 +1,5 @@
 import json
+from frongo.fremen_interface import *
 
 def get_field(item, key):
     fields = key.split('.')
@@ -21,9 +22,11 @@ class TModels(object):
         self.data_conf=data_conf
         self.timestamp_field = timestamp_field
         self.timestamp_type = timestamp_type
+        self.order = -1
         self.epochs=[]
         self.states=[]
         self._set_data_configuration()
+        self._fremen = fremen_interface()
 
     def _set_props_from_dict(self, data):
         for i in data.keys():
@@ -58,7 +61,19 @@ class TModels(object):
                     state=True
                 if a in self._dconf["False"]:
                     state=False
+        else:
+            state = get_field(entry, self.data_field)
         return state
+        
+    def _create_fremen_models(self):
+        self.order = self._fremen.create_fremen_model(self.name, self.epochs, self.states, self.data_type)
+
+
+    def _predict_outcome(self, epochs, order=-1):
+        if order < 0:
+            order= self.order
+        probs=self._fremen.predict_outcome(epochs, self.name, order)
+        return probs
 
     def __repr__(self):
         a = dir(self)
@@ -69,7 +84,10 @@ class TModels(object):
                 b.append(str(i))
       
         for i in b:
-            s = s + str(i) +': ' + str(self.__getattribute__(i)) + '\n'
+            if type(self.__getattribute__(i)) is not list:
+                s = s + str(i) +': ' + str(self.__getattribute__(i)) + '\n'
+            else:
+                s = s + str(i) +': [list with ' + str(len(self.__getattribute__(i))) +' ' + str(type(self.__getattribute__(i)[0])) + ' elements]\n'
 
         return s
         

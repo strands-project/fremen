@@ -1,9 +1,24 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(frongo)
 
-find_package(catkin REQUIRED COMPONENTS fremenserver mongodb_store)
+find_package(catkin REQUIRED COMPONENTS rospy std_msgs message_generation fremenserver mongodb_store)
 
 catkin_python_setup()
+
+#######################################
+## Declare ROS messages and services ##
+#######################################
+
+add_service_files(
+  FILES
+  PredictState.srv
+  GraphModel.srv
+)
+
+generate_messages(
+    DEPENDENCIES
+    std_msgs 
+)
 
 catkin_package()
 
