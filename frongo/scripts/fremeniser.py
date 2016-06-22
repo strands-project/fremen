@@ -78,7 +78,8 @@ class frongo(object):
             if i.name == req.model_name:
                 probs = i._predict_outcome(epochs)
        
-        return [probs]
+        return epochs, probs
+
 
 
     def create_models(self, data):
