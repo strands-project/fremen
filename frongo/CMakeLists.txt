@@ -11,8 +11,10 @@ catkin_python_setup()
 
 add_service_files(
   FILES
-  PredictState.srv
+  AddModel.srv
+  BuildModel.srv
   GraphModel.srv
+  PredictState.srv
 )
 
 generate_messages(
