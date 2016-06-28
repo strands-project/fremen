@@ -2,6 +2,8 @@ $def with (data)
 
 $var title: Frongo.
 
+
+
 <div class="row clearfix">
 	<div class="col-md-12 column">
 		<div class="panel panel-default">
@@ -20,17 +22,91 @@ $var title: Frongo.
 						  </button>
 						  <ul class="dropdown-menu">
 								$for q in data['queries']:
-							    	<li><a href="#">$q</a></li>
+							    	<li><a>$q</a></li>
 						  </ul>
 						</div>
 
 					</div>
-		  		<div class="form-group">
+<!-- 		  		<div class="form-group">
 						<button type="submit" formmethod="post" formaction="$data['submit_url']" class="btn btn-primary btn-lg btn-block">Submit</button>
 					</div>
+ -->
+
+
 				</form>
+
+				<div>
+						<script type="text/javascript">
+
+							function display_chart(data) {
+								var ctx = document.getElementById("resultChart").getContext("2d");
+
+									
+								chart_obj = new Chart(ctx).Line(data, {legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li style=\"color:<%=datasets[i].strokeColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+								    animation: false
+								});
+								$$("div#legend").html(chart_obj.generateLegend());
+
+							}
+
+
+							function update_chart(data) {
+								// Get the context of the canvas element we want to select
+
+								display_chart(data);
+							}
+
+
+							$$(document).ready(function () {
+
+									Chart.defaults.global.responsive = true;
+
+								}
+							);
+							
+						</script>
+
+						<div class="row clearfix">
+							<div class="col-md-12 column">
+								<div class="panel panel-default">
+								  	<div class="panel-heading">
+								    	<h3 class="panel-title">
+										    History
+								    	</h3>
+								  	</div>
+								  	<div class="panel-body">
+								  		<h3 id="question" class="panel-title">Question</h3>
+
+								  		<div id="histogram" >
+									  		<canvas style="padding: 0;
+															margin: auto;
+															display: block;
+															width: 600px;" id="resultChart" width="500" height="300"></canvas>
+							                                <p><div id="legend"></div></p>
+										</div>
+								  	</div>
+							  	</div>
+
+							</div>
+						</div>
+
+
 
 		  	</div>
 		</div>
 	</div>
 </div>
+
+<script>
+$$(".dropdown-menu li a").click(function(){
+  $$(this).parents(".dropdown").find('.btn').html($$(this).text() + ' <span class="caret"></span>');
+  $$(this).parents(".dropdown").find('.btn').val($$(this).data('value'));
+
+	$$.getJSON("/query", function (data) {
+		console.log(data);
+	  update_chart(data);
+	});
+
+});
+</script>
+
