@@ -12,6 +12,7 @@ import std_msgs
 from frongo.temporal_models import *
 from frongo.graph_models import *
 from frongo.srv import PredictState
+from frongo.srv import PredictStateOrder
 from frongo.srv import GraphModel
 from frongo.srv import AddModel
 
@@ -50,6 +51,7 @@ class frongo(object):
 
         #Advertise Service
         self.predict_srv=rospy.Service('/frongo/predict_models', PredictState, self.predict_cb)
+        self.predict_srv=rospy.Service('/frongo/predict_models_with_order', PredictStateOrder, self.predict_order_cb)
         self.graph_build_srv=rospy.Service('/frongo/graph_model_build', GraphModel, self.graph_model_build_cb)
         self.new_model_srv=rospy.Service('/frongo/add_model_defs', AddModel, self.add_model_cb)
         
@@ -98,6 +100,17 @@ class frongo(object):
         for i in self.models:
             if i.name == req.model_name:
                 probs = i._predict_outcome(epochs)
+       
+        return epochs, probs
+
+    def predict_order_cb(self, req):
+        epochs =[]
+        for i in req.epochs:
+            epochs.append(i)
+
+        for i in self.models:
+            if i.name == req.model_name:
+                probs = i._predict_outcome(epochs, order=req.order)
        
         return epochs, probs
 

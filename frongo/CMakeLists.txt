@@ -15,6 +15,7 @@ add_service_files(
   BuildModel.srv
   GraphModel.srv
   PredictState.srv
+  PredictStateOrder.srv
 )
 
 generate_messages(
