@@ -72,3 +72,28 @@ This a JSON string where you can define some preprocessing for the values, for *
 ```
 Where *True* is a list of the values that should be considered as **1** in your fremen model, and *False* is a list of the values that should be considered as **0**
 
+## Ok, I can create my own models, but, what do I do with them?
+
+Once you have created the models you can get predictions using the service `/frongo/predict_models` which is as follows:
+
+```
+string model_name       # SEND: The name of the model to be predicted
+uint32[] epochs         # SEND: The list of epochs you want the prediction for
+---
+uint32[] epochs         # GET: The list of epochs the prediction was made for
+float64[] probs         # GET: The list of state probabilities for each epoch on the top list
+```
+This service uses the best order evaluated for this model.
+
+If you want to create predictions with an specific fremen order you can use the `/frongo/predict_models_with_order` wich looks like this:
+
+```
+string model_name
+int32    order
+uint32[] epochs
+---
+uint32[] epochs
+```
+
+The order field allows you to request predictions using any order.
+float64[] probs
