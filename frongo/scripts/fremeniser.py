@@ -14,6 +14,7 @@ from frongo.graph_models import *
 from frongo.srv import PredictState
 from frongo.srv import PredictStateOrder
 from frongo.srv import GraphModel
+from frongo.srv import GetInfo
 from frongo.srv import AddModel
 
 def load_yaml(filename):
@@ -54,11 +55,21 @@ class frongo(object):
         self.predict_srv=rospy.Service('/frongo/predict_models_with_order', PredictStateOrder, self.predict_order_cb)
         self.graph_build_srv=rospy.Service('/frongo/graph_model_build', GraphModel, self.graph_model_build_cb)
         self.new_model_srv=rospy.Service('/frongo/add_model_defs', AddModel, self.add_model_cb)
+        self.info_srv=rospy.Service('/frongo/get_models', GetInfo, self.get_model_info_cb)
         
         #self.graph_model_construction()
         rospy.loginfo("All Done ...")
         rospy.spin()
 
+
+    def get_model_info_cb(self, req):
+        names=[]
+        info=[]
+        for i in self.models:
+            names.append(i.name)
+            info.append(i._get_info())
+
+        return names, info        
 
 
     def add_model_cb(self, req):
