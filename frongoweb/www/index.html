@@ -101,12 +101,15 @@ $var title: Frongo.
 
 
 			$$.getJSON("/query", function (data) {
-				console.log(data);
 			  update_chart(data);
 			});
 
 
 		}
+
+		$$(".form_datetime").change(function(){
+			query();
+		});
 
 
 		$$(".dropdown-menu li a").click(function(){
