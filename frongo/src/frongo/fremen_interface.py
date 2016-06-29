@@ -185,7 +185,29 @@ class fremen_interface(object):
         #print ps
         prob = list(ps.probabilities)
         return prob
-    
+        
+    def predict_entropy(self, epochs, name, order):
+        #print epoch, mods, ords
+        fremgoal = fremenserver.msg.FremenGoal()
+        fremgoal.operation = 'entropy'
+        fremgoal.id = name
+        
+        for i in epochs:
+            fremgoal.times.append(i)
+        
+        fremgoal.order = order
+        #fremgoal.orders = ords
+        
+        self.FremenClient.send_goal(fremgoal)
+        self.FremenClient.wait_for_result(timeout=rospy.Duration(10.0))
+
+#        if self.FremenClient.get_state() == actionlib.GoalStatus.SUCCEEDED:
+        ps = self.FremenClient.get_result()
+        print "Entropies"
+        print ps
+        prob = list(ps.entropies)
+        return prob
+        
 
     def forecast_outcome(self, epoch, mods, ords):
         #print epoch, mods, ords
