@@ -90,33 +90,14 @@ class TModels(object):
             order= self.order
         probs=self._fremen.predict_outcome(epochs, self.name, order)
         return probs
-        
+    
+    
     def _predict_entropy(self, epochs, order=-1):
         if order < 0:
             order= self.order
         probs=self._fremen.predict_entropy(epochs, self.name, order)
         print probs
         return probs
-
-        
-
-    def _get_info(self):
-        a = dir(self)
-        b =[]
-        s = {}
-        for i in a:
-            if not i.startswith('_'):
-                b.append(str(i))
-      
-        for i in b:
-            if type(self.__getattribute__(i)) is not list:
-                s[str(i)] =  self.__getattribute__(i)
-            else:
-                st= '[list with ' + str(len(self.__getattribute__(i))) +' ' + str(type(self.__getattribute__(i)[0])) + ' elements]'
-                s[str(i)] = st
-        
-        out=yaml.safe_dump(s,default_flow_style=False)
-        return out
 
 
     def _get_info(self):
