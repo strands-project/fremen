@@ -51,8 +51,11 @@ class frongo(object):
         rospy.sleep(3)
 
         #Advertise Service
+
+        self.predict_ent_srv=rospy.Service('/frongo/get_entropies', PredictState, self.predict_entropy_cb)
+        self.predict_ent_ord_srv=rospy.Service('/frongo/get_entropies_with_order', PredictStateOrder, self.predict_entropy_order_cb)
         self.predict_srv=rospy.Service('/frongo/predict_models', PredictState, self.predict_cb)
-        self.predict_srv=rospy.Service('/frongo/predict_models_with_order', PredictStateOrder, self.predict_order_cb)
+        self.predict_ord_srv=rospy.Service('/frongo/predict_models_with_order', PredictStateOrder, self.predict_order_cb)
         self.graph_build_srv=rospy.Service('/frongo/graph_model_build', GraphModel, self.graph_model_build_cb)
         self.new_model_srv=rospy.Service('/frongo/add_model_defs', AddModel, self.add_model_cb)
         self.info_srv=rospy.Service('/frongo/get_models', GetInfo, self.get_model_info_cb)
@@ -110,9 +113,21 @@ class frongo(object):
 
         for i in self.models:
             if i.name == req.model_name:
-                probs = i._predict_outcome(epochs)
+                predictions = i._predict_outcome(epochs)
        
-        return epochs, probs
+        return epochs, predictions
+
+    def predict_entropy_cb(self, req):
+        epochs =[]
+        for i in req.epochs:
+            epochs.append(i)
+
+        for i in self.models:
+            if i.name == req.model_name:
+                predictions = i._predict_entropy(epochs)
+       
+        return epochs, predictions
+
 
     def predict_order_cb(self, req):
         epochs =[]
@@ -121,10 +136,20 @@ class frongo(object):
 
         for i in self.models:
             if i.name == req.model_name:
-                probs = i._predict_outcome(epochs, order=req.order)
+                predictions = i._predict_outcome(epochs, order=req.order)
        
-        return epochs, probs
+        return epochs, predictions
 
+    def predict_entropy_order_cb(self, req):
+        epochs =[]
+        for i in req.epochs:
+            epochs.append(i)
+
+        for i in self.models:
+            if i.name == req.model_name:
+                predictions = i._predict_entropy(epochs, order=req.order)
+       
+        return epochs, predictions
 
 
     def create_models(self, data):

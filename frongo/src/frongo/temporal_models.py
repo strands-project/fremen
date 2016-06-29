@@ -90,6 +90,15 @@ class TModels(object):
             order= self.order
         probs=self._fremen.predict_outcome(epochs, self.name, order)
         return probs
+        
+    def _predict_entropy(self, epochs, order=-1):
+        if order < 0:
+            order= self.order
+        probs=self._fremen.predict_entropy(epochs, self.name, order)
+        print probs
+        return probs
+
+        
 
     def _get_info(self):
         a = dir(self)
