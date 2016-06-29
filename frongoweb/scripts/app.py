@@ -48,9 +48,17 @@ class Index:
 
 class Query:
 
+    def query_frongo(self):
+        # to be changed into the actual query
+        res = {
+            'epochs': [1467230400, 1467234000, 1467241200],
+            'values': [0.2, 0.4, 0.3],
+            'entropies': [0.3, 0.6, 0.2]
+        }
+        return res
+
     def prepare_plot(self):
-        probs_data = [.1, .2, .5, .7, .3, .6]
-        ent_data = [.3, .1, .2, .5, .7, .3]
+        d = self.query_frongo()
         dataset_probs = {
             'label': 'Probability',
             'fillColor': "rgba(0,0,220,0.3)",
@@ -59,7 +67,7 @@ class Query:
             'pointStrokeColor': "#fff",
             'pointHighlightFill': "#fff",
             'pointHighlightStroke': "rgba(220,220,220,1)",
-            'data': probs_data
+            'data': d['values']
         }
 
         dataset_ent = {
@@ -70,11 +78,11 @@ class Query:
             'pointStrokeColor': "#fff",
             'pointHighlightFill': "#fff",
             'pointHighlightStroke': "rgba(220,220,220,1)",
-            'data': ent_data
+            'data': d['entropies']
         }
 
         data = {
-            'labels': [str(s) for s in probs_data],
+            'labels': [str(s) for s in d['epochs']],
             'datasets': [dataset_probs, dataset_ent]
         }
 

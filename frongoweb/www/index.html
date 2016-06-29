@@ -13,11 +13,10 @@ $var title: Frongo.
 		    	</h3>
 		  	</div>
 		  	<div class="panel-body">
-				<form class="form" role="form" action="submit" method="post">
 			  	<div class="form-group">
 						<div class="dropdown">
 						  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
-						  	Query
+						  	Model
 						  	<span class="caret"></span>
 						  </button>
 						  <ul class="dropdown-menu">
@@ -25,15 +24,25 @@ $var title: Frongo.
 							    	<li><a>$q</a></li>
 						  </ul>
 						</div>
-
 					</div>
+					<div class="input-group">
+						<span class="input-group-addon" id="from">|<-</span>
+						<input type="text" class="form-control form_datetime" placeholder="From" aria-describedby="from">
+						
+						<span class="input-group-addon" id="to">->|</span>
+						<input type="text" class="form-control form_datetime" placeholder="To" aria-describedby="to">
+					</div>
+
+					<script type="text/javascript">
+  						$$(".form_datetime").datetimepicker({format: 'yyyy-mm-dd hh:ii'});
+					</script> 
+
 <!-- 		  		<div class="form-group">
 						<button type="submit" formmethod="post" formaction="$data['submit_url']" class="btn btn-primary btn-lg btn-block">Submit</button>
 					</div>
  -->
 
 
-				</form>
 
 				<div>
 						<script type="text/javascript">
@@ -71,12 +80,10 @@ $var title: Frongo.
 								<div class="panel panel-default">
 								  	<div class="panel-heading">
 								    	<h3 class="panel-title">
-										    History
+										    Frongo Predictions
 								    	</h3>
 								  	</div>
 								  	<div class="panel-body">
-								  		<h3 id="question" class="panel-title">Question</h3>
-
 								  		<div id="histogram" >
 									  		<canvas style="padding: 0;
 															margin: auto;
