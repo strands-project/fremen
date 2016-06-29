@@ -14,6 +14,7 @@ add_service_files(
   AddModel.srv
   BuildModel.srv
   GraphModel.srv
+  GetInfo.srv
   PredictState.srv
   PredictStateOrder.srv
 )
