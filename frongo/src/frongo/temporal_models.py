@@ -1,4 +1,5 @@
 import json
+import yaml
 from frongo.fremen_interface import *
 
 def get_field(item, key):
@@ -61,8 +62,23 @@ class TModels(object):
                     state=True
                 if a in self._dconf["False"]:
                     state=False
+        elif self.data_type == 'float':
+            if not self.data_conf:
+                state = get_field(entry, self.data_field)
+            else:
+                a = get_field(entry, self.data_field)
+                if self._dconf.has_key('max'):
+                    v_max=self._dconf["max"]
+                else:
+                    v_max=1
+                if self._dconf.has_key('min'):
+                    v_min=self._dconf["min"]
+                else:
+                    v_min=0
+                state = (a-v_min)/(v_max-v_min)
         else:
             state = get_field(entry, self.data_field)
+            
         return state
         
     def _create_fremen_models(self):
@@ -74,6 +90,25 @@ class TModels(object):
             order= self.order
         probs=self._fremen.predict_outcome(epochs, self.name, order)
         return probs
+
+    def _get_info(self):
+        a = dir(self)
+        b =[]
+        s = {}
+        for i in a:
+            if not i.startswith('_'):
+                b.append(str(i))
+      
+        for i in b:
+            if type(self.__getattribute__(i)) is not list:
+                s[str(i)] =  self.__getattribute__(i)
+            else:
+                st= '[list with ' + str(len(self.__getattribute__(i))) +' ' + str(type(self.__getattribute__(i)[0])) + ' elements]'
+                s[str(i)] = st
+        
+        out=yaml.safe_dump(s,default_flow_style=False)
+        return out
+
 
     def __repr__(self):
         a = dir(self)

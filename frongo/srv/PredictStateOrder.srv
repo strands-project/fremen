@@ -1,4 +1,5 @@
 string model_name
+int32    order
 uint32[] epochs
 ---
 uint32[] epochs

@@ -1,0 +1,11 @@
+string name
+string data_field
+string data_type
+string data_conf
+string timestamp_field
+string timestamp_type
+string query
+string db
+string collection
+---
+bool result
