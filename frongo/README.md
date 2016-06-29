@@ -62,7 +62,10 @@ Lets look at them again with the default values for each of them:
 
 ## But, how do I define the `data_conf` field?
 
-This a JSON string where you can define some preprocessing for the values, for *boolean* models such definition looks like this:
+This a JSON string where you can define some preprocessing for the values.
+
+### Boolean models 
+For *boolean* models such definition looks like this:
 
 ```JSON
 {
@@ -71,6 +74,19 @@ This a JSON string where you can define some preprocessing for the values, for *
 }
 ```
 Where *True* is a list of the values that should be considered as **1** in your fremen model, and *False* is a list of the values that should be considered as **0**
+
+### Float type models
+
+For *float* models you can define a linear normalisation to fit the values between **0** and **1** such definition looks like this:
+
+```JSON
+{
+    "mim":0, 
+    "max":1
+}
+```
+
+Where *min* is the value that should be correspond to **0** and  *max* the value that corresponds to **1**
 
 ## Ok, I can create my own models, but, what do I do with them?
 
