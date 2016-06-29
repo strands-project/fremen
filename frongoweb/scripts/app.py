@@ -9,6 +9,7 @@ import web
 import signal
 from json import dumps
 from datetime import datetime
+from time import mktime, strptime
 from bson import json_util
 from os import _exit
 
@@ -20,6 +21,8 @@ from os import chdir
 TEMPLATE_DIR = roslib.packages.get_pkg_dir('frongoweb') + '/www'
 chdir(TEMPLATE_DIR)
 
+DATETIME_PATTERN = '%d.%m.%Y %H:%M'
+DATETIME_PATTERN_JS = 'dd.mm.yyyy hh:ii'
 
 renderer = web.template.render(TEMPLATE_DIR, base="base", globals=globals())
 
@@ -41,12 +44,19 @@ class Index:
     def GET(self):
         data = {
           'submit_url': '/query',
-          'queries': ['test1', 'test2']
+          'queries': ['test1', 'test2'],
+          'datetime_format': DATETIME_PATTERN_JS
         }
         return renderer.index(data)
 
 
 class Query:
+
+    def dts_to_epoch(self, dts):
+        return int(mktime(strptime(dts, DATETIME_PATTERN)))
+
+    def epoch_to_dts(self, epoch):
+        return datetime.fromtimestamp(epoch).strftime(DATETIME_PATTERN)
 
     def query_frongo(self):
         # to be changed into the actual query
@@ -82,7 +92,8 @@ class Query:
         }
 
         data = {
-            'labels': [str(s) for s in d['epochs']],
+            'labels': [self.epoch_to_dts(s)
+                       for s in d['epochs']],
             'datasets': [dataset_probs, dataset_ent]
         }
 
@@ -99,7 +110,6 @@ class Query:
 
 
 def signal_handler(signum, frame):
-    print "stopped."
     _exit(signal.SIGTERM)
 
 
@@ -108,7 +118,7 @@ if __name__ == '__main__':
     app = FrongoApp(urls, globals())
 
     signal.signal(signal.SIGINT, signal_handler)
-    rospy.init_node("frongo_server")
+    rospy.init_node("frongo_webserver")
     port = rospy.get_param('~port', 8999)
 
     app.run(port=port)

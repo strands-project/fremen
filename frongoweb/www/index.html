@@ -15,66 +15,25 @@ $var title: Frongo.
 		  	<div class="panel-body">
 			  	<div class="form-group">
 						<div class="dropdown">
-						  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
+						  <button id="model" class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">
 						  	Model
 						  	<span class="caret"></span>
 						  </button>
 						  <ul class="dropdown-menu">
 								$for q in data['queries']:
-							    	<li><a>$q</a></li>
+							    	<li><a value="$q">$q</a></li>
 						  </ul>
 						</div>
 					</div>
 					<div class="input-group">
 						<span class="input-group-addon" id="from">|<-</span>
 						<input type="text" class="form-control form_datetime" placeholder="From" aria-describedby="from">
-						
+
 						<span class="input-group-addon" id="to">->|</span>
 						<input type="text" class="form-control form_datetime" placeholder="To" aria-describedby="to">
 					</div>
 
-					<script type="text/javascript">
-  						$$(".form_datetime").datetimepicker({format: 'yyyy-mm-dd hh:ii'});
-					</script> 
-
-<!-- 		  		<div class="form-group">
-						<button type="submit" formmethod="post" formaction="$data['submit_url']" class="btn btn-primary btn-lg btn-block">Submit</button>
-					</div>
- -->
-
-
-
 				<div>
-						<script type="text/javascript">
-
-							function display_chart(data) {
-								var ctx = document.getElementById("resultChart").getContext("2d");
-
-									
-								chart_obj = new Chart(ctx).Line(data, {legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li style=\"color:<%=datasets[i].strokeColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
-								    animation: false
-								});
-								$$("div#legend").html(chart_obj.generateLegend());
-
-							}
-
-
-							function update_chart(data) {
-								// Get the context of the canvas element we want to select
-
-								display_chart(data);
-							}
-
-
-							$$(document).ready(function () {
-
-									Chart.defaults.global.responsive = true;
-
-								}
-							);
-							
-						</script>
-
 						<div class="row clearfix">
 							<div class="col-md-12 column">
 								<div class="panel panel-default">
@@ -104,16 +63,57 @@ $var title: Frongo.
 	</div>
 </div>
 
-<script>
-$$(".dropdown-menu li a").click(function(){
-  $$(this).parents(".dropdown").find('.btn').html($$(this).text() + ' <span class="caret"></span>');
-  $$(this).parents(".dropdown").find('.btn').val($$(this).data('value'));
+<script type="text/javascript">
+		function display_chart(data) {
+			var ctx = document.getElementById("resultChart").getContext("2d");
 
-	$$.getJSON("/query", function (data) {
-		console.log(data);
-	  update_chart(data);
-	});
+				
+			chart_obj = new Chart(ctx).Line(data, {legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li style=\"color:<%=datasets[i].strokeColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+			    animation: false
+			});
+			$$("div#legend").html(chart_obj.generateLegend());
 
-});
+		}
+
+
+		function update_chart(data) {
+			// Get the context of the canvas element we want to select
+
+			display_chart(data);
+		}
+
+
+		$$(document).ready(function () {
+
+				Chart.defaults.global.responsive = true;
+
+			}
+		);
+
+
+		//$$(".form_datetime").datetimepicker({format: 'yyyy-mm-dd hh:ii'});
+		$$(".form_datetime").datetimepicker({format: "$data['datetime_format']"});
+
+
+		function query() {
+			console.log("query");
+			console.log($$("#model").val());
+
+
+			$$.getJSON("/query", function (data) {
+				console.log(data);
+			  update_chart(data);
+			});
+
+
+		}
+
+
+		$$(".dropdown-menu li a").click(function(){
+		  $$(this).parents(".dropdown").find('.btn').html($$(this).text() + ' <span class="caret"></span>');
+		  $$(this).parents(".dropdown").find('.btn').val($$(this).text());
+
+		  query();
+		});
 </script>
 
