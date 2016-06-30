@@ -26,11 +26,11 @@ $var title: Frongo.
 						</div>
 					</div>
 					<div class="input-group">
-						<span class="input-group-addon" id="from">|<-</span>
-						<input type="text" class="form-control form_datetime" placeholder="From" aria-describedby="from">
+						<span class="input-group-addon">|<-</span>
+						<input type="text" class="form-control form_datetime" id="from" placeholder="From" aria-describedby="from">
 
-						<span class="input-group-addon" id="to">->|</span>
-						<input type="text" class="form-control form_datetime" placeholder="To" aria-describedby="to">
+						<span class="input-group-addon">->|</span>
+						<input type="text" class="form-control form_datetime" id="to" placeholder="To" aria-describedby="to">
 					</div>
 
 				<div>
@@ -67,11 +67,12 @@ $var title: Frongo.
 		function display_chart(data) {
 			var ctx = document.getElementById("resultChart").getContext("2d");
 
-				
-			chart_obj = new Chart(ctx).Line(data, {legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li style=\"color:<%=datasets[i].strokeColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+			if( window.chart_obj!==undefined)
+     			window.chart_obj.destroy();	
+			window.chart_obj = new Chart(ctx).Line(data, {legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li style=\"color:<%=datasets[i].strokeColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
 			    animation: false
 			});
-			$$("div#legend").html(chart_obj.generateLegend());
+			$$("div#legend").html(window.chart_obj.generateLegend());
 
 		}
 
@@ -100,9 +101,14 @@ $var title: Frongo.
 			console.log($$("#model").val());
 
 
-			$$.getJSON("/query", function (data) {
-			  update_chart(data);
-			});
+			$$.getJSON("/query", {
+					model: $$("#model").val(),
+					epoch_from: $$("#from").val(),
+					epoch_to: $$("#to").val()
+				}, function (data) {
+			    update_chart(data);
+			  }
+			);
 
 
 		}

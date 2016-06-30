@@ -7,9 +7,10 @@ import roslib
 
 import web
 import signal
+from random import random
 from json import dumps
 from datetime import datetime
-from time import mktime, strptime
+from time import mktime, strptime, time
 from bson import json_util
 from os import _exit
 
@@ -52,23 +53,32 @@ class Index:
 
 class Query:
 
+    RESOLUTION = 50
+    MIN_STEP = 300
+
     def dts_to_epoch(self, dts):
         return int(mktime(strptime(dts, DATETIME_PATTERN)))
 
     def epoch_to_dts(self, epoch):
         return datetime.fromtimestamp(epoch).strftime(DATETIME_PATTERN)
 
-    def query_frongo(self):
+    def query_frongo(self, model, epoch_from, epoch_to):
+        duration = epoch_to - epoch_from
+        steps_from_duration = int(duration / self.RESOLUTION)
+        steps = max(steps_from_duration, self.MIN_STEP)
+
+        epochs = range(epoch_from, epoch_to+steps, steps)
+
+        rospy.loginfo(epochs)
         # to be changed into the actual query
         res = {
-            'epochs': [1467230400, 1467234000, 1467241200],
-            'values': [0.2, 0.4, 0.3],
-            'entropies': [0.3, 0.6, 0.2]
+            'epochs': epochs,
+            'values': [random() for e in epochs],
+            'entropies': [random() for e in epochs]
         }
         return res
 
-    def prepare_plot(self):
-        d = self.query_frongo()
+    def prepare_plot(self, d):
         dataset_probs = {
             'label': 'Probability',
             'fillColor': "rgba(0,0,220,0.3)",
@@ -106,7 +116,26 @@ class Query:
         return dumps(data, default=json_util.default)
 
     def GET(self):
-        return self.prepare_plot()
+        user_data = web.input()
+        print user_data
+        if len(user_data['model']) == 0:
+            rospy.logwarn('empty model received from web form')
+            return web.BadRequest()
+        try:
+            epoch_from = self.dts_to_epoch(user_data['epoch_from'])
+        except Exception as e:
+            rospy.logwarn(e)
+            epoch_from = int(time())-3600
+        try:
+            epoch_to = self.dts_to_epoch(user_data['epoch_to'])
+        except Exception as e:
+            rospy.logwarn(e)
+            epoch_to = int(time())
+
+        d = self.query_frongo(user_data['model'],
+                              epoch_from,
+                              epoch_to)
+        return self.prepare_plot(d)
 
 
 def signal_handler(signum, frame):
