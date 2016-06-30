@@ -21,17 +21,28 @@ $var title: Frongo.
 						  </button>
 						  <ul class="dropdown-menu">
 								$for q in data['queries']:
-							    	<li><a value="$q">$q</a></li>
+							    	<li><a title="$q[1]" value="$q[0]">$q[0]</a></li>
 						  </ul>
 						</div>
 					</div>
 					<div class="input-group">
 						<span class="input-group-addon">|<-</span>
-						<input type="text" class="form-control form_datetime" id="from" placeholder="From" aria-describedby="from">
+						<input type="text" class="form-control form_datetime" id="from" placeholder="From" aria-describedby="from"/>
 
 						<span class="input-group-addon">->|</span>
-						<input type="text" class="form-control form_datetime" id="to" placeholder="To" aria-describedby="to">
+						<input type="text" class="form-control form_datetime" id="to" placeholder="To" aria-describedby="to"/>
 					</div>
+					<div class="input-group">
+						  <label for="order">Select Order</label>
+						  <select class="form-control" id="order">
+						    <option>0</option>
+						    <option>1</option>
+						    <option>2</option>
+						    <option>3</option>
+						    <option>4</option>
+						  </select>
+					</div>
+					
 
 				<div>
 						<div class="row clearfix">
@@ -51,10 +62,33 @@ $var title: Frongo.
 							                                <p><div id="legend"></div></p>
 										</div>
 								  	</div>
-							  	</div>
+						  	</div>
 
 							</div>
 						</div>
+
+
+
+						<div class="row clearfix">
+							<div class="col-md-12 column">
+								<div class="panel panel-default">
+								  	<div class="panel-heading">
+								    	<h3 class="panel-title">
+										    Model Info
+								    	</h3>
+								  	</div>
+								  	<div class="panel-body">
+										  	<div class="form-group">
+												  <label for="modelinfo">Model Info:</label>
+												  <textarea readonly class="form-control" rows="20" id="modelinfo">	
+												  </textarea>
+												</div>
+								  	</div>
+						  	</div>
+
+							</div>
+						</div>
+
 
 
 
@@ -84,13 +118,6 @@ $var title: Frongo.
 		}
 
 
-		$$(document).ready(function () {
-
-				Chart.defaults.global.responsive = true;
-
-			}
-		);
-
 
 		//$$(".form_datetime").datetimepicker({format: 'yyyy-mm-dd hh:ii'});
 		$$(".form_datetime").datetimepicker({format: "$data['datetime_format']"});
@@ -104,9 +131,11 @@ $var title: Frongo.
 			$$.getJSON("/query", {
 					model: $$("#model").val(),
 					epoch_from: $$("#from").val(),
-					epoch_to: $$("#to").val()
+					epoch_to: $$("#to").val(),
+					order: $$("#order").val(),
 				}, function (data) {
 			    update_chart(data);
+			    $$('#modelinfo').val(data['model_info'])
 			  }
 			);
 
@@ -117,12 +146,35 @@ $var title: Frongo.
 			query();
 		});
 
+		$$("#order").change(function(){
+			query();
+		});
+
+
+		function choose_model(item) {
+		  $$(item).parents(".dropdown").find('.btn').html($$(item).text() + ' <span class="caret"></span>');
+		  $$(item).parents(".dropdown").find('.btn').val($$(item).text());
+		  $$(item).parents(".dropdown").find('.btn').attr('title', $$(item).attr('title'));
+		}
+
 
 		$$(".dropdown-menu li a").click(function(){
-		  $$(this).parents(".dropdown").find('.btn').html($$(this).text() + ' <span class="caret"></span>');
-		  $$(this).parents(".dropdown").find('.btn').val($$(this).text());
+			choose_model(this);
+		  // $$(this).parents(".dropdown").find('.btn').html($$(this).text() + ' <span class="caret"></span>');
+		  // $$(this).parents(".dropdown").find('.btn').val($$(this).text());
+		  // $$(this).parents(".dropdown").find('.btn').attr('title', $$(this).attr('title'));
 
 		  query();
 		});
+
+		$$(document).ready(function () {
+
+				Chart.defaults.global.responsive = true;
+				choose_model($$(".dropdown-menu li a:first"));
+				query();	
+			}
+		);
+
+
 </script>
 

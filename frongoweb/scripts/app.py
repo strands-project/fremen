@@ -7,14 +7,17 @@ import roslib
 
 import web
 import signal
-from random import random
 from json import dumps
 from datetime import datetime
 from time import mktime, strptime, time
 from bson import json_util
 from os import _exit
+from urllib import urlencode
 
 from os import chdir
+
+from frongo.srv import PredictStateOrder
+from frongo.srv import GetInfo
 
 
 
@@ -43,12 +46,48 @@ class FrongoApp(web.application):
 class Index:
 
     def GET(self):
+        frongo = FrongoBridge()
+
+        info = frongo.get_info()
         data = {
           'submit_url': '/query',
-          'queries': ['test1', 'test2'],
+          'queries': info,
           'datetime_format': DATETIME_PATTERN_JS
         }
         return renderer.index(data)
+
+
+class FrongoBridge:
+
+    pred_srv_name = '/frongo/predict_models_with_order'
+    entr_srv_name = '/frongo/get_entropies_with_order'
+    info_srv_name = '/frongo/get_models'
+
+    def __init__(self):
+        rospy.loginfo('waiting for services')
+        rospy.wait_for_service(self.pred_srv_name)
+        rospy.wait_for_service(self.info_srv_name)
+        self.pred_srv = rospy.ServiceProxy(self.pred_srv_name,
+                                           PredictStateOrder)
+        self.entr_srv = rospy.ServiceProxy(self.entr_srv_name,
+                                           PredictStateOrder)
+        self.info_srv = rospy.ServiceProxy(self.info_srv_name,
+                                           GetInfo)
+        rospy.loginfo('frongo services ready')
+
+    def get_info(self):
+        infos = self.info_srv()
+
+        res = zip(infos.names, infos.info)
+        return res
+
+    def query_values(self, model, order, epochs):
+        res = self.pred_srv(model, int(order), epochs)
+        return res
+
+    def query_entropies(self, model, order, epochs):
+        res = self.entr_srv(model, int(order), epochs)
+        return res
 
 
 class Query:
@@ -62,7 +101,7 @@ class Query:
     def epoch_to_dts(self, epoch):
         return datetime.fromtimestamp(epoch).strftime(DATETIME_PATTERN)
 
-    def query_frongo(self, model, epoch_from, epoch_to):
+    def query_frongo(self, model, order, epoch_from, epoch_to):
         duration = epoch_to - epoch_from
         steps_from_duration = int(duration / self.RESOLUTION)
         steps = max(steps_from_duration, self.MIN_STEP)
@@ -71,11 +110,26 @@ class Query:
 
         rospy.loginfo(epochs)
         # to be changed into the actual query
+        frongo = FrongoBridge()
+        fpred = frongo.query_values(model, order, epochs)
+        fentr = frongo.query_entropies(model, order, epochs)
+        finfo = ''
+
+        for f in frongo.get_info():
+            if f[0] == model:
+                finfo = f[1]
+
         res = {
-            'epochs': epochs,
-            'values': [random() for e in epochs],
-            'entropies': [random() for e in epochs]
+            'epochs': fpred.epochs,
+            'values': fpred.predictions,
+            'entropies': fentr.predictions,
+            'model_info': finfo
         }
+        # res = {
+        #     'epochs': epochs,
+        #     'values': [random() for e in epochs],
+        #     'entropies': [random() for e in epochs]
+        # }
         return res
 
     def prepare_plot(self, d):
@@ -104,7 +158,8 @@ class Query:
         data = {
             'labels': [self.epoch_to_dts(s)
                        for s in d['epochs']],
-            'datasets': [dataset_probs, dataset_ent]
+            'datasets': [dataset_probs, dataset_ent],
+            'model_info': d['model_info']
         }
 
         # dataset = {
@@ -133,6 +188,7 @@ class Query:
             epoch_to = int(time())
 
         d = self.query_frongo(user_data['model'],
+                              user_data['order'],
                               epoch_from,
                               epoch_to)
         return self.prepare_plot(d)
@@ -143,11 +199,10 @@ def signal_handler(signum, frame):
 
 
 if __name__ == '__main__':
-
+    rospy.init_node("frongo_webserver")
+    port = rospy.get_param('~port', 8999)
     app = FrongoApp(urls, globals())
 
     signal.signal(signal.SIGINT, signal_handler)
-    rospy.init_node("frongo_webserver")
-    port = rospy.get_param('~port', 8999)
 
     app.run(port=port)
