@@ -15,7 +15,7 @@ can be extremely useful to create state predictions based on the information sto
 
 Frongo is a *ROS* node that can be executed running:
 
-`rosrun frongo fremeniser.py [-h] [-yaml_defs YAML_DEFS]`
+**`rosrun frongo fremeniser.py [-h] [-yaml_defs YAML_DEFS]`**
 
 Where YAML_DEFS is a file defining the Fremen model to be created, defining the query and data type that is to be modeled, an example file could be like this:
 
@@ -39,8 +39,11 @@ Where YAML_DEFS is a file defining the Fremen model to be created, defining the 
     data_conf: '{"True":["OPEN"], "False":["CLOSED"]}'
 ```
 
-You can also create your own models in runtime sending the *YAML* configuration as a string to the node via the  `/frongo/predict_models` service.
+You can also create your own models in runtime sending the *YAML* configuration as a string to the node via the  **`/frongo/add_model_defs`** service. Alternatively you can the **add_models_from_yaml** script, which can be executed as follows:
 
+**`rosrun frongo add_models_from_yaml.py definitions.yaml`**
+
+Where **definitions.yaml** is a *YAML* file with the definitions of the models to be added.
 
 ## What do all these fields mean?
 
@@ -92,24 +95,70 @@ Where *min* is the value that should be correspond to **0** and  *max* the value
 
 Once you have created the models you can get predictions using the service `/frongo/predict_models` which is as follows:
 
-```
+```YAML
 string model_name       # SEND: The name of the model to be predicted
 uint32[] epochs         # SEND: The list of epochs you want the prediction for
 ---
 uint32[] epochs         # GET: The list of epochs the prediction was made for
-float64[] probs         # GET: The list of state probabilities for each epoch on the top list
+float64[] predictions   # GET: The list of state probabilities for each epoch on the top list
 ```
 This service uses the best order evaluated for this model.
 
 If you want to create predictions with an specific fremen order you can use the `/frongo/predict_models_with_order` wich looks like this:
 
-```
+```YAML
 string model_name
 int32    order
 uint32[] epochs
 ---
 uint32[] epochs
+float64[] predictions
 ```
 
 The order field allows you to request predictions using any order.
-float64[] probs
+
+
+## How do I setup my MongoDB address and port?
+
+The MongoDB address and port can be set via rosparams:
+
+**`rosparam set /mongodb_host <your mongodb server address>`**
+
+**`rosparam set /mongodb_port <your mongodb server port>`**
+
+## How do I know which models are already loaded?
+
+You can use the **`/frongo/get_models`** service which look like this:
+
+```YAML
+---
+string[] names
+string[] info
+```
+
+Where **names** is the list of all the model names and **info** is a yaml string with the internal variables of each model.
+
+## Is there anything else I should know?
+
+YES, this is so awesome you can also get the model entropy over time using the services:
+
+* **`/frongo/get_entropies`** For the best model order, which looks like this:
+
+    ```
+    string model_name
+    uint32[] epochs
+    ---
+    uint32[] epochs
+    float64[] predictions
+    ```
+
+* **`/frongo/get_entropies_with_order`** to specify the model order, like this:
+
+    ```
+    string model_name
+    int32    order
+    uint32[] epochs
+    ---
+    uint32[] epochs
+    float64[] predictions
+    ```
