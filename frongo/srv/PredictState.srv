@@ -2,4 +2,4 @@ string model_name
 uint32[] epochs
 ---
 uint32[] epochs
-float64[] probs
+float64[] predictions

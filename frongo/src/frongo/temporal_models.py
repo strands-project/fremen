@@ -28,6 +28,9 @@ class TModels(object):
         self.states=[]
         self._set_data_configuration()
         self._fremen = fremen_interface()
+        if self.data_type == 'boolean':
+            self.min_value=False
+            self.max_value=True
 
     def _set_props_from_dict(self, data):
         for i in data.keys():
@@ -42,15 +45,43 @@ class TModels(object):
         else:
             self._dconf=self.data_conf
 
-    def _add_entry(self, entry):            
+    def _add_entry(self, entry):     
         if self.timestamp_type == 'datetime':
             epoch = int(get_field(entry, self.timestamp_field).strftime('%s'))
         else:
             epoch = int(get_field(entry, self.timestamp_field))
         state=self._decode_state(entry)
 
+        self._set_min_max_values(state, epoch)
+            
         self.states.append(state)
         self.epochs.append(epoch)
+
+    def _set_min_max_values(self, state, epoch):
+        if hasattr(self, 'min_epoch'):
+            if epoch< self.min_epoch:
+                self.min_epoch=epoch
+        else:
+            self.min_epoch=epoch
+            
+        if hasattr(self, 'max_epoch'):
+            if epoch > self.max_epoch:
+                self.max_epoch=epoch
+        else:
+            self.max_epoch=epoch
+
+        if self.data_type != 'boolean':
+            if hasattr(self, 'min_value'):
+                if epoch< self.min_value:
+                    self.min_value=state
+            else:
+                self.min_value=state
+                
+            if hasattr(self, 'max_value'):
+                if epoch > self.max_value:
+                    self.max_value=state
+        else:
+            self.max_value=state            
 
     def _decode_state(self, entry):
         if self.data_type == 'boolean':
@@ -90,6 +121,34 @@ class TModels(object):
             order= self.order
         probs=self._fremen.predict_outcome(epochs, self.name, order)
         return probs
+    
+    
+    def _predict_entropy(self, epochs, order=-1):
+        if order < 0:
+            order= self.order
+        probs=self._fremen.predict_entropy(epochs, self.name, order)
+        print probs
+        return probs
+
+
+    def _get_states(self, epochs):
+        ret_epochs=[]
+        ret_states=[]
+        if len(epochs) < 2:
+            lowr=self.min_epoch
+            highr=self.max_epoch
+        else:
+            lowr=epochs[0]
+            highr=epochs[1]
+        
+        for i in range(len(self.epochs)):
+            if lowr <= self.epochs[i] <= highr:
+                ret_epochs.append(self.epochs[i])
+                ret_states.append(self.states[i])
+                
+        #print "GET STATES: ", len(ret_epochs), len(ret_states)
+        return ret_epochs, ret_states
+
 
     def _get_info(self):
         a = dir(self)
