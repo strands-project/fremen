@@ -1,0 +1,15 @@
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+}
+
+.scrollable-menu {
+    height: auto;
+    max-height: 300px;
+    overflow-x: hidden;
+}
+
+/* CSS to allow comments to be hidden */
+.form-control[hidden]{
+    display: none;
+}

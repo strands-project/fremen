@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <package>
-  <name>frongo</name>
+  <name>frongoweb</name>
   <version>0.2.1</version>
-  <description>The frongo package</description>
+  <description>The frongoweb package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-  <maintainer email="JPulidoFentanes@lincoln.ac.uk">Jaime Pulido Fentanes</maintainer>
+  <maintainer email="marc@hanheide.net">Marc Hanheide</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but mutiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/frongo</url> -->
+  <!-- <url type="website">http://wiki.ros.org/frongoweb</url> -->
 
 
   <!-- Author tags are optional, mutiple are allowed, one per tag -->
@@ -40,18 +40,19 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>fremenserver</build_depend>
-  <build_depend>mongodb</build_depend>
-  <build_depend>mongodb-dev</build_depend>
-  <build_depend>mongodb_store</build_depend>
-  <run_depend>fremenserver</run_depend>
-  <run_depend>mongodb</run_depend>
-  <run_depend>mongodb-dev</run_depend>
-  <run_depend>mongodb_store</run_depend>
+  <build_depend>frongo</build_depend>
+  <build_depend>python-webpy</build_depend>
+  <build_depend>rospy</build_depend>
+  <run_depend>frongo</run_depend>
+  <run_depend>python-webpy</run_depend>
+  <run_depend>rospy</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
+    <!-- You can specify that this package is a metapackage here: -->
+    <!-- <metapackage/> -->
+
     <!-- Other tools can request additional information be placed here -->
 
   </export>
