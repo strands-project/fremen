@@ -9,7 +9,7 @@ $var title: Frongo.
 		<div class="panel panel-default">
 		  	<div class="panel-heading">
 		    	<h3 class="panel-title">
-		    		Frongo - Query 
+		    		Frongo - <a id="queryurl" href="/" title="bookmark me to save the query">Query</a>
 		    	</h3>
 		  	</div>
 		  	<div class="panel-body">
@@ -34,12 +34,12 @@ $var title: Frongo.
 					</div>
 					<div class="input-group">
 						  <label for="order">Select Order</label>
-						  <select class="form-control" id="order" value="$data['def_order']">
-						    <option>0</option>
-						    <option>1</option>
-						    <option>2</option>
-						    <option>3</option>
-						    <option>4</option>
+						  <select class="form-control" id="order">
+						    <option value="0">0</option>
+						    <option value="1">1</option>
+						    <option value="2">2</option>
+						    <option value="3">3</option>
+						    <option value="4">4</option>
 						  </select>
 					</div>
 					
@@ -60,7 +60,7 @@ $var title: Frongo.
 															display: block;
 															width: 600px;" id="resultChart" width="500" height="300"></canvas>
 							                                <p><div id="legend"></div></p>
-										</div>
+											</div>
 								  	</div>
 						  	</div>
 
@@ -135,7 +135,8 @@ $var title: Frongo.
 					order: $$("#order").val(),
 				}, function (data) {
 			    update_chart(data);
-			    $$('#modelinfo').val(data['model_info'])
+			    $$('#modelinfo').val(data['model_info']);
+			    $$('#queryurl').attr('href', data['url']);
 			  }
 			);
 
@@ -173,6 +174,7 @@ $var title: Frongo.
 				if ("$data['def_model']" != "") {
 					$$("#model").html("$data['def_model']" + ' <span class="caret"></span>');
 					$$("#model").val("$data['def_model']");
+					$$("#order").val("$data['def_order']");
 				} else {
 					choose_model($$(".dropdown-menu li a:first"));
 				}

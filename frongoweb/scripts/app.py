@@ -174,7 +174,7 @@ class Query:
         #     'data': [results[r] for r in sorted_keys]
         # }
 
-        return dumps(data, default=json_util.default)
+        return data
 
     def GET(self):
         user_data = web.input()
@@ -197,7 +197,17 @@ class Query:
                               user_data['order'],
                               epoch_from,
                               epoch_to)
-        return self.prepare_plot(d)
+        data = self.prepare_plot(d)
+        query_params = {
+            'model':    user_data['model'],
+            'order':    str(user_data['order']),
+            'from':     self.epoch_to_dts(epoch_from),
+            'to':       self.epoch_to_dts(epoch_to)
+        }
+
+        data['url'] = '/?' + urlencode(query_params)
+        print data['url']
+        return dumps(data, default=json_util.default)
 
 
 def signal_handler(signum, frame):
