@@ -27,14 +27,14 @@ $var title: Frongo.
 					</div>
 					<div class="input-group">
 						<span class="input-group-addon">|<-</span>
-						<input type="text" class="form-control form_datetime" id="from" placeholder="From" aria-describedby="from"/>
+						<input type="text" class="form-control form_datetime" id="from" placeholder="From" aria-describedby="from" value="$data['def_from']"/>
 
 						<span class="input-group-addon">->|</span>
-						<input type="text" class="form-control form_datetime" id="to" placeholder="To" aria-describedby="to"/>
+						<input type="text" class="form-control form_datetime" id="to" placeholder="To" aria-describedby="to"  value="$data['def_to']"/>
 					</div>
 					<div class="input-group">
 						  <label for="order">Select Order</label>
-						  <select class="form-control" id="order">
+						  <select class="form-control" id="order" value="$data['def_order']">
 						    <option>0</option>
 						    <option>1</option>
 						    <option>2</option>
@@ -170,7 +170,13 @@ $var title: Frongo.
 		$$(document).ready(function () {
 
 				Chart.defaults.global.responsive = true;
-				choose_model($$(".dropdown-menu li a:first"));
+				if ("$data['def_model']" != "") {
+					$$("#model").html("$data['def_model']" + ' <span class="caret"></span>');
+					$$("#model").val("$data['def_model']");
+				} else {
+					choose_model($$(".dropdown-menu li a:first"));
+				}
+
 				query();	
 			}
 		);

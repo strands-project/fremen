@@ -46,13 +46,19 @@ class FrongoApp(web.application):
 class Index:
 
     def GET(self):
+        user_data = web.input()
         frongo = FrongoBridge()
+
 
         info = frongo.get_info()
         data = {
           'submit_url': '/query',
           'queries': info,
-          'datetime_format': DATETIME_PATTERN_JS
+          'datetime_format': DATETIME_PATTERN_JS,
+          'def_from': user_data['from'] if 'from' in user_data else '',
+          'def_to': user_data['to'] if 'to' in user_data else '',
+          'def_order': user_data['order'] if 'order' in user_data else '0',
+          'def_model': user_data['model'] if 'model' in user_data else '',
         }
         return renderer.index(data)
 
