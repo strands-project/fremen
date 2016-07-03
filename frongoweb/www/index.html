@@ -54,18 +54,42 @@ $var title: Frongo.
 								    	</h3>
 								  	</div>
 								  	<div class="panel-body">
+								  		<h4><div id="legend"></div></h4>
 								  		<div id="histogram" >
 									  		<canvas style="padding: 0;
 															margin: auto;
 															display: block;
 															width: 600px;" id="resultChart" width="500" height="300"></canvas>
-							                                <p><div id="legend"></div></p>
 											</div>
 								  	</div>
 						  	</div>
 
 							</div>
 						</div>
+
+
+
+
+						<div class="row clearfix">
+							<div class="col-md-12 column">
+								<div class="panel panel-default">
+								  	<div class="panel-heading">
+								    	<h3 class="panel-title">
+										    Frongo Observations
+								    	</h3>
+								  	</div>
+								  	<div class="panel-body">
+									  		<canvas style="padding: 0;
+															margin: auto;
+															display: block;
+															width: 600px;" id="obsChart" width="500" height="300"></canvas>
+							                                </p>
+								  	</div>
+						  	</div>
+
+							</div>
+						</div>
+
 
 
 
@@ -98,11 +122,12 @@ $var title: Frongo.
 </div>
 
 <script type="text/javascript">
-		function display_chart(data) {
+		function display_predictions(data) {
 			var ctx = document.getElementById("resultChart").getContext("2d");
 
 			if( window.chart_obj!==undefined)
      			window.chart_obj.destroy();	
+
 			window.chart_obj = new Chart(ctx).Line(data, {legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li style=\"color:<%=datasets[i].strokeColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
 			    animation: false
 			});
@@ -110,12 +135,18 @@ $var title: Frongo.
 
 		}
 
+		function display_observations(data) {
+			var ctx = document.getElementById("obsChart").getContext("2d");
 
-		function update_chart(data) {
-			// Get the context of the canvas element we want to select
+			if( window.obs_chart_obj!==undefined)
+     			window.obs_chart_obj.destroy();	
 
-			display_chart(data);
+			window.obs_chart_obj = new Chart(ctx).Bar(data, {
+			    animation: false
+			});
+
 		}
+
 
 
 
@@ -134,7 +165,8 @@ $var title: Frongo.
 					epoch_to: $$("#to").val(),
 					order: $$("#order").val(),
 				}, function (data) {
-			    update_chart(data);
+					display_predictions(data['prediction_chart']);
+					display_observations(data['observation_chart']);
 			    $$('#modelinfo').val(data['model_info']);
 			    $$('#queryurl').attr('href', data['url']);
 			  }

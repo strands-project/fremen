@@ -142,6 +142,7 @@ class Query:
             'epochs': fpred.epochs,
             'values': fpred.predictions,
             'states': fstates.predictions,
+            'states_epochs': fstates.epochs,
             'entropies': fentr.predictions,
             'model_info': finfo
         }
@@ -152,7 +153,7 @@ class Query:
         # }
         return res
 
-    def prepare_plot(self, d):
+    def prepare_prediction_plot(self, d):
         dataset_probs = {
             'label': 'Probability',
             'fillColor': "rgba(0,0,220,0.3)",
@@ -182,11 +183,26 @@ class Query:
             'model_info': d['model_info']
         }
 
-        # dataset = {
-        #     'label': "responses",
-        #     'fillColor': "rgba(120,0,0,0.5)",
-        #     'data': [results[r] for r in sorted_keys]
-        # }
+        return data
+
+    def prepare_observation_plot(self, d):
+        dataset_obs = {
+            'label': 'Observations',
+            'fillColor': "rgba(220,0,220,0.3)",
+            'strokeColor': "rgba(0,0,220,1)",
+            'pointColor': "rgba(0,0,220,1)",
+            'pointStrokeColor': "#fff",
+            'pointHighlightFill': "#fff",
+            'pointHighlightStroke': "rgba(220,220,220,1)",
+            'data': d['states']
+        }
+
+        data = {
+            'labels': [self.epoch_to_dts(s)
+                       for s in d['states_epochs']],
+            'datasets': [dataset_obs],
+            'model_info': d['model_info']
+        }
 
         return data
 
@@ -211,12 +227,20 @@ class Query:
                               user_data['order'],
                               epoch_from,
                               epoch_to)
-        data = self.prepare_plot(d)
+
+        prediction_chart = self.prepare_prediction_plot(d)
+        observation_chart = self.prepare_observation_plot(d)
         query_params = {
             'model':    user_data['model'],
             'order':    str(user_data['order']),
             'from':     self.epoch_to_dts(epoch_from),
             'to':       self.epoch_to_dts(epoch_to)
+        }
+
+        data = {
+            'prediction_chart':     prediction_chart,
+            'observation_chart':    observation_chart,
+            'url':                  '/?' + urlencode(query_params)
         }
 
         data['url'] = '/?' + urlencode(query_params)
@@ -230,8 +254,3 @@ def signal_handler(signum, frame):
 if __name__ == '__main__':
     rospy.init_node("frongo_webserver")
     port = rospy.get_param('~port', 8999)
-    app = FrongoApp(urls, globals())
-
-    signal.signal(signal.SIGINT, signal_handler)
-
-    app.run(port=port)
