@@ -54,12 +54,11 @@ $var title: Frongo.
 								    	</h3>
 								  	</div>
 								  	<div class="panel-body">
-								  		<h4><div id="legend"></div></h4>
 								  		<div id="histogram" >
 									  		<canvas style="padding: 0;
 															margin: auto;
 															display: block;
-															width: 600px;" id="resultChart" width="500" heihgt="300"></canvas>
+															width: 600px;" id="resultChart" width="500" height="200"></canvas>
 											</div>
 								  	</div>
 						  	</div>
@@ -82,7 +81,7 @@ $var title: Frongo.
 									  		<canvas style="padding: 0;
 															margin: auto;
 															display: block;
-															width: 600px;" id="obsChart" width="500" height="300"></canvas>
+															width: 600px;" id="obsChart" width="500" height="100"></canvas>
 							                                </p>
 								  	</div>
 						  	</div>
@@ -129,15 +128,14 @@ $var title: Frongo.
      			window.chart_obj.destroy();	
 
 			window.chart_obj = new Chart(ctx,
-				{data: data, type: 'line'},
-				{legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li style=\"color:<%=datasets[i].strokeColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+				{data: data, type: 'line', 'options': {
 			    animation: false
-			});
-			$$("div#legend").html(window.chart_obj.generateLegend());
+			}});
+			//$$("div#legend").html(window.chart_obj.generateLegend());
 
 		}
 
-		function display_observations(data) {
+		function display_observations(data, minv, maxv) {
 			var ctx = document.getElementById("obsChart").getContext("2d");
 
 			if( window.obs_chart_obj!==undefined)
@@ -149,8 +147,8 @@ $var title: Frongo.
         	scales: {
             xAxes: [{
             		ticks: {
-            			min: data['min'],
-            			max: data['max']
+            			min: minv,
+            			max: maxv
             		},
                 type: 'linear',
                 position: 'top'
@@ -180,7 +178,7 @@ $var title: Frongo.
 		     	console.log(data)
 
 					display_predictions(data['prediction_chart']);
-					display_observations(data['observation_chart']);
+					display_observations(data['observation_chart'],data['min'],data['max']);
 			    $$('#modelinfo').val(data['model_info']);
 			    $$('#queryurl').attr('href', data['url']);
 			  }

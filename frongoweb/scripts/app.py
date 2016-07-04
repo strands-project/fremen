@@ -108,7 +108,7 @@ class FrongoBridge:
 
 class Query:
 
-    RESOLUTION = 50
+    RESOLUTION = 500
     MIN_STEP = 300
 
     def dts_to_epoch(self, dts):
@@ -188,9 +188,10 @@ class Query:
     def prepare_observation_plot(self, d):
         dataset_obs = {
             'label': 'Observations',
-            'fillColor': "rgba(220,0,220,0.3)",
-            'strokeColor': "rgba(0,0,220,1)",
-            'pointColor': "rgba(0,0,220,1)",
+            'fill': False,
+            'backgroundColor': "rgba(220,0,220,0.3)",
+            'borderColor': "rgba(0,0,0,0)",
+            'borderWidth': 0,
             'pointStrokeColor': "#fff",
             'pointHighlightFill': "#fff",
             'pointHighlightStroke': "rgba(220,220,220,1)",
@@ -200,6 +201,7 @@ class Query:
         print 'data:', dataset_obs['data']
 
         data = {
+            'type': 'line',
             'labels': [self.epoch_to_dts(s)
                        for s in d['states_epochs']],
             'datasets': [dataset_obs],
