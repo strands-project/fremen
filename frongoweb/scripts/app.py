@@ -156,8 +156,8 @@ class Query:
     def prepare_prediction_plot(self, d):
         dataset_probs = {
             'label': 'Probability',
-            'fillColor': "rgba(0,0,220,0.3)",
-            'strokeColor': "rgba(0,0,220,1)",
+            'backgroundColor': "rgba(0,0,220,0.3)",
+            'borderColor': "rgba(0,0,220,1)",
             'pointColor': "rgba(0,0,220,1)",
             'pointStrokeColor': "#fff",
             'pointHighlightFill': "#fff",
@@ -167,8 +167,8 @@ class Query:
 
         dataset_ent = {
             'label': 'Entropy',
-            'fillColor': "rgba(0,220,120,0.3)",
-            'strokeColor': "rgba(0,220,120,1)",
+            'backgroundColor': "rgba(0,220,120,0.3)",
+            'borderColor': "rgba(0,220,120,1)",
             'pointColor': "rgba(0,220,120,1)",
             'pointStrokeColor': "#fff",
             'pointHighlightFill': "#fff",
@@ -194,8 +194,10 @@ class Query:
             'pointStrokeColor': "#fff",
             'pointHighlightFill': "#fff",
             'pointHighlightStroke': "rgba(220,220,220,1)",
-            'data': d['states']
+            'data': [{'x': p[1], 'y': p[0]} for p in zip(d['states'], d['states_epochs'])]
         }
+
+        print 'data:', dataset_obs['data']
 
         data = {
             'labels': [self.epoch_to_dts(s)
@@ -240,7 +242,9 @@ class Query:
         data = {
             'prediction_chart':     prediction_chart,
             'observation_chart':    observation_chart,
-            'url':                  '/?' + urlencode(query_params)
+            'url':                  '/?' + urlencode(query_params),
+            'min':                  epoch_from,
+            'max':                  epoch_to
         }
 
         data['url'] = '/?' + urlencode(query_params)
@@ -254,3 +258,6 @@ def signal_handler(signum, frame):
 if __name__ == '__main__':
     rospy.init_node("frongo_webserver")
     port = rospy.get_param('~port', 8999)
+    app = FrongoApp(urls, globals())
+    signal.signal(signal.SIGINT, signal_handler)
+    app.run(port=port)

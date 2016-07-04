@@ -59,7 +59,7 @@ $var title: Frongo.
 									  		<canvas style="padding: 0;
 															margin: auto;
 															display: block;
-															width: 600px;" id="resultChart" width="500" height="300"></canvas>
+															width: 600px;" id="resultChart" width="500" heihgt="300"></canvas>
 											</div>
 								  	</div>
 						  	</div>
@@ -128,7 +128,9 @@ $var title: Frongo.
 			if( window.chart_obj!==undefined)
      			window.chart_obj.destroy();	
 
-			window.chart_obj = new Chart(ctx).Line(data, {legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li style=\"color:<%=datasets[i].strokeColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+			window.chart_obj = new Chart(ctx,
+				{data: data, type: 'line'},
+				{legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li style=\"color:<%=datasets[i].strokeColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
 			    animation: false
 			});
 			$$("div#legend").html(window.chart_obj.generateLegend());
@@ -141,10 +143,20 @@ $var title: Frongo.
 			if( window.obs_chart_obj!==undefined)
      			window.obs_chart_obj.destroy();	
 
-			window.obs_chart_obj = new Chart(ctx).Bar(data, {
-			    animation: false
-			});
-
+			window.obs_chart_obj = new Chart(ctx,
+				{data: data, type: 'scatter', 'options': {
+			    animation: false,
+        	scales: {
+            xAxes: [{
+            		ticks: {
+            			min: data['min'],
+            			max: data['max']
+            		},
+                type: 'linear',
+                position: 'top'
+            }]
+        }
+    	}});
 		}
 
 
@@ -165,6 +177,8 @@ $var title: Frongo.
 					epoch_to: $$("#to").val(),
 					order: $$("#order").val(),
 				}, function (data) {
+		     	console.log(data)
+
 					display_predictions(data['prediction_chart']);
 					display_observations(data['observation_chart']);
 			    $$('#modelinfo').val(data['model_info']);
