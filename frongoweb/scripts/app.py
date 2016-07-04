@@ -246,7 +246,8 @@ class Query:
             'observation_chart':    observation_chart,
             'url':                  '/?' + urlencode(query_params),
             'min':                  epoch_from,
-            'max':                  epoch_to
+            'max':                  epoch_to,
+            'model_info':			prediction_chart['model_info']
         }
 
         data['url'] = '/?' + urlencode(query_params)
