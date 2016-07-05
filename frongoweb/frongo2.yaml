@@ -1,0 +1,22 @@
+- model:
+    name: "doors"
+    db: "message_store"
+    collection: "door_stats"
+    query: '{"topological_map_name" : "lg_march2016"}'
+    data_field: "opened"
+    data_type: "boolean"
+- model:
+    name: "navs"
+    db: "message_store"
+    collection: "nav_stats"
+    query: "{}"
+    data_field: "status"
+    data_type: "boolean"
+    data_conf: '{"True":["success"], "False":["fatal","failed"]}'
+- model:
+    name: "door_wp2"
+    db: "message_store"
+    collection: "door_stats"
+    query: '{"topological_map_name" : "lg_march2016", "source_waypoint":"WayPoint2"}'
+    data_field: "opened"
+    data_type: "boolean"
