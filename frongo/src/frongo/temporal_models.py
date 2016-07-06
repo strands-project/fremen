@@ -1,5 +1,6 @@
 import json
 import yaml
+import datetime
 from frongo.fremen_interface import *
 
 def get_field(item, key):
@@ -52,23 +53,28 @@ class TModels(object):
             epoch = int(get_field(entry, self.timestamp_field))
         state=self._decode_state(entry)
 
-        self._set_min_max_values(state, epoch)
-            
-        self.states.append(state)
-        self.epochs.append(epoch)
+        if state != 'none':
+            self._set_min_max_values(state, epoch)
+                
+            self.states.append(state)
+            self.epochs.append(epoch)
 
     def _set_min_max_values(self, state, epoch):
         if hasattr(self, 'min_epoch'):
             if epoch< self.min_epoch:
                 self.min_epoch=epoch
+                self.from_date=datetime.datetime.fromtimestamp(epoch).strftime('%Y-%m-%d %H:%M:%S')
         else:
             self.min_epoch=epoch
+            self.from_date=datetime.datetime.fromtimestamp(epoch).strftime('%Y-%m-%d %H:%M:%S')
             
         if hasattr(self, 'max_epoch'):
             if epoch > self.max_epoch:
                 self.max_epoch=epoch
+                self.to_date=datetime.datetime.fromtimestamp(epoch).strftime('%Y-%m-%d %H:%M:%S')
         else:
             self.max_epoch=epoch
+            self.to_date=datetime.datetime.fromtimestamp(epoch).strftime('%Y-%m-%d %H:%M:%S')
 
         if self.data_type != 'boolean':
             if hasattr(self, 'min_value'):
@@ -84,6 +90,7 @@ class TModels(object):
             self.max_value=state            
 
     def _decode_state(self, entry):
+        state = 'none'
         if self.data_type == 'boolean':
             if not self.data_conf:
                 state = get_field(entry, self.data_field)
@@ -97,18 +104,19 @@ class TModels(object):
             if not self.data_conf:
                 state = get_field(entry, self.data_field)
             else:
-                a = get_field(entry, self.data_field)
+                a = float(get_field(entry, self.data_field))
                 if self._dconf.has_key('max'):
-                    v_max=self._dconf["max"]
+                    v_max=float(self._dconf["max"])
                 else:
-                    v_max=1
+                    v_max=1.0
                 if self._dconf.has_key('min'):
-                    v_min=self._dconf["min"]
+                    v_min=float(self._dconf["min"])
                 else:
-                    v_min=0
-                state = (a-v_min)/(v_max-v_min)
+                    v_min=0.0
+                state = float((a-v_min)/(v_max-v_min))
+
         else:
-            state = get_field(entry, self.data_field)
+            state = float(get_field(entry, self.data_field))
             
         return state
         
@@ -168,6 +176,15 @@ class TModels(object):
         out=yaml.safe_dump(s,default_flow_style=False)
         return out
 
+    def _dump_to_file(self, filename):
+        fh = open(filename, "w")
+        fh.close
+
+        for i in range(len(self.epochs)):
+            fh = open(filename, "a")
+            s_output = "%d; %d\n" %(self.epochs[i], self.states[i])
+            fh.write(s_output)
+        fh.close
 
     def __repr__(self):
         a = dir(self)
