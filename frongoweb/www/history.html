@@ -1,0 +1,68 @@
+$def with (data)
+
+$var title: QuickVote History
+
+
+<script type="text/javascript">
+
+	last_data = null;
+
+
+	function display_chart(data) {
+		var ctx = document.getElementById("resultChart").getContext("2d");
+
+			
+		chart_obj = new Chart(ctx).Line(data, {legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li style=\"color:<%=datasets[i].strokeColor%>\"><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>",
+		    animation: false
+		});
+		$$("div#legend").html(chart_obj.generateLegend());
+
+	}
+
+
+	function update_chart(data) {
+		// Get the context of the canvas element we want to select
+
+		$$("h3#question").text(data['question'])
+
+		display_chart(data);
+	}
+
+
+	$$(document).ready(function () {
+
+			Chart.defaults.global.responsive = true;
+
+			$$.getJSON("$data['get_url']?mode=history", function (data) {
+				console.log(data);
+			    update_chart(data);
+			});
+
+		}
+	);
+	
+</script>
+
+<div class="row clearfix">
+	<div class="col-md-12 column">
+		<div class="panel panel-default">
+		  	<div class="panel-heading">
+		    	<h3 class="panel-title">
+				    History
+		    	</h3>
+		  	</div>
+		  	<div class="panel-body">
+		  		<h3 id="question" class="panel-title">Question</h3>
+
+		  		<div id="histogram" >
+			  		<canvas style="padding: 0;
+									margin: auto;
+									display: block;
+									width: 600px;" id="resultChart" width="500" height="300"></canvas>
+	                                <p><div id="legend"></div></p>
+				</div>
+		  	</div>
+	  	</div>
+
+	</div>
+</div>

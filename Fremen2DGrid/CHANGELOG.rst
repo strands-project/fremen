@@ -2,6 +2,23 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2016-02-17)
+------------------
+* added nav_msgs as dependency
+  fixes `#21 <https://github.com/strands-project/fremen/issues/21>`_
+* Messing with CMakeLists.txt
+* nav msgs deps added
+* Added missing package to the package.xml
+* Contributors: Marc Hanheide, Tom Krajnik
+
+0.2.0 (2016-02-04)
+------------------
+* Towards topometric mapping FreMen
+* First attempt to represent recency
+* Added estimate entropy action
+* ROS-compatible FreMen grid
+* Contributors: Tom Krajnik
+
 0.1.3 (2015-04-08)
 ------------------
 * Minor bug in last added data timestamp removed.

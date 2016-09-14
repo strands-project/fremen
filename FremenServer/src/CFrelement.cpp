@@ -27,7 +27,7 @@ CFrelement::~CFrelement()
 }
 
 // adds new state observations at given times
-int CFrelement::add(uint32_t times[],unsigned char states[],int length)
+int CFrelement::add(uint32_t times[],float states[],int length)
 {
 	if (measurements == 0 && length > 0)
 	{

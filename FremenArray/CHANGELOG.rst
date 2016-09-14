@@ -2,6 +2,15 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2016-02-17)
+------------------
+
+0.2.0 (2016-02-04)
+------------------
+* Added estimate entropy action
+* FremenArray: FreMEn for 2D grids.
+* Contributors: Tom Krajnik
+
 0.1.3 (2015-04-08)
 ------------------
 * Minor bug in last added data timestamp removed.

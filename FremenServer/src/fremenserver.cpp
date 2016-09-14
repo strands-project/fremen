@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include "ros/ros.h"
+#include "std_msgs/Bool.h"
+
 #include "CFrelementSet.h"
 #include <actionlib/server/simple_action_server.h>
 #include <fremenserver/FremenAction.h>
@@ -56,7 +58,11 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 	else if (goal->operation == "add")
 	{
 		if (goal->times.size() == goal->states.size()){
-			result.success = frelements.add(goal->id.c_str(),(uint32_t*)goal->times.data(),(unsigned char*)goal->states.data(),(int)goal->states.size());
+			float values[goal->states.size()];
+			for (int i=0;i<goal->states.size();i++){
+				if (goal->states[i]) values[i] = 1; else values[i] = 0;
+			}
+			result.success = frelements.add(goal->id.c_str(),(uint32_t*)goal->times.data(),values,(int)goal->states.size());
 			if (result.success >=0)
 			{
 				mess << "Added " << result.success << " of the " << (int)goal->states.size() << " provided measurements to the state " << goal->id;
@@ -72,7 +78,27 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			result.success = -2;
 			server->setAborted(result);
 		}
-	}	
+	}
+	else if (goal->operation == "addvalues")
+	{
+		if (goal->times.size() == goal->values.size()){
+			result.success = frelements.add(goal->id.c_str(),(uint32_t*)goal->times.data(),(float*)goal->values.data(),(int)goal->values.size());
+			if (result.success >=0)
+			{
+				mess << "Added " << result.success << " of the " << (int)goal->values.size() << " provided measurements to the state " << goal->id;
+				result.message = mess.str(); 
+			}else{
+				mess << "A new state " <<  goal->id << " was added to the collection and filled with "  << (int)goal->values.size() << " measurements.";
+				result.message = mess.str(); 
+			}
+			server->setSucceeded(result);
+		}else{
+			mess << "The length of the 'values' and 'times' arrays does not match.";
+			result.message = mess.str(); 
+			result.success = -2;
+			server->setAborted(result);
+		}
+	}
 	else if (goal->operation == "evaluate")
 	{
 		if (goal->times.size() == goal->states.size()){
@@ -249,7 +275,7 @@ int test()
 {
 	CFrelementSet frelements;
 	uint32_t 	times[100000];
-	unsigned char 	state[100000];
+	float 		state[100000];
 	float 		probsA[100000];
 	float 		probsB[100000];
 	int len = 7*24*60;
@@ -274,7 +300,7 @@ int test()
 	frelements.print(true);
 	file = fopen("output.txt","w");
 	
-	for (int i = 0;i<len;i++)fprintf(file,"%i %.3f %.3f\n",state[i],probsA[i],probsB[i]);
+	for (int i = 0;i<len;i++)fprintf(file,"%.3f %.3f %.3f\n",state[i],probsA[i],probsB[i]);
 	fclose(file);
 }
 
@@ -287,9 +313,15 @@ int main(int argc,char* argv[])
 	server = new Server(*n, "/fremenserver", boost::bind(&actionServerCallback, _1, server), false);
 	server->start();
 
+	ros::Publisher starter_pub = n->advertise<std_msgs::Bool>("/fremenserver_start", 1, true);
+	std_msgs::Bool msg;
+	msg.data=true;
+	starter_pub.publish(msg);
+
 	while (ros::ok()){
 		ros::spinOnce();
 		usleep(30000);
 	}
+
 	return 0;
 }
