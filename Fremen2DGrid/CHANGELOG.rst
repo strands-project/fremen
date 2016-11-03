@@ -2,6 +2,9 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.2.1 (2016-02-17)
 ------------------
 * added nav_msgs as dependency

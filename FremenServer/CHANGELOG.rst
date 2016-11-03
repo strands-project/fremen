@@ -2,6 +2,12 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Publishing topic when fremenserver is started so model are generated in case fremenserver respawns
+* Fixing bug in fremenserver
+* Contributors: Jaime Pulido Fentanes
+
 0.2.1 (2016-02-17)
 ------------------
 
