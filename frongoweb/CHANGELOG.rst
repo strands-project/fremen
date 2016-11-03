@@ -2,6 +2,9 @@
 Changelog for package frongoweb
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.2.2 (2016-11-03)
 ------------------
 * Frongoweb improvements (`#35 <https://github.com/strands-project/fremen/issues/35>`_)
