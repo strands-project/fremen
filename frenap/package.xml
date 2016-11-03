@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>frenap</name>
-  <version>0.2.1</version>
+  <version>0.2.2</version>
   <description>FreNaP is a Frequency-based Navigation Prediction tool. It uses the Frequency Map Enhancement to find reoccuring patterns in navigation statistics gathered in topological maps. The FreNaP can be used to predict if a particular edge of a topological edge is going to be traversable at a given time and it also attemprs to estimate how long the traversal is going to take.</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 

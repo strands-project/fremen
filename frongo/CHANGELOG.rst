@@ -2,8 +2,8 @@
 Changelog for package frongo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.2 (2016-11-03)
+------------------
 * Last changes before FreMen Demo (`#36 <https://github.com/strands-project/fremen/issues/36>`_)
   * last changes before FreMen Demo
 * Frongoweb (`#34 <https://github.com/strands-project/fremen/issues/34>`_)
