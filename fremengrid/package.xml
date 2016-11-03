@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>fremengrid</name>
-  <version>0.2.2</version>
+  <version>0.3.0</version>
   <description>Frequency Map Enhanced 3D occupancy grid - non uniform Fourier transform version</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 

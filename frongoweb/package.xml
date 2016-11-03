@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>frongoweb</name>
-  <version>0.2.2</version>
+  <version>0.3.0</version>
   <description>The frongoweb package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
