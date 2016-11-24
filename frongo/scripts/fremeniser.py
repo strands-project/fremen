@@ -9,6 +9,7 @@ import numpy as np
 
 import std_msgs
 
+from std_srvs.srv import Trigger
 from frongo.temporal_models import *
 from frongo.graph_models import *
 from frongo.srv import PredictState
@@ -59,6 +60,7 @@ class frongo(object):
         self.graph_build_srv=rospy.Service('/frongo/graph_model_build', GraphModel, self.graph_model_build_cb)
         self.new_model_srv=rospy.Service('/frongo/add_model_defs', AddModel, self.add_model_cb)
         self.info_srv=rospy.Service('/frongo/get_models', GetInfo, self.get_model_info_cb)
+        self.rebuild_srv=rospy.Service('/frongo/rebuild_all_models', Trigger, self.rebuild_all_models_cb)
         
         #self.graph_model_construction()
         rospy.loginfo("All Done ...")
@@ -92,10 +94,12 @@ class frongo(object):
         data=[]
         print req.model_def
         datum = yaml.load(req.model_def)
+        print datum
         if not isinstance(datum, list):
             data.append(datum)
         else:
             data=datum
+            
         self.create_models(data)
 
         if self.is_fremen_active:
@@ -118,6 +122,23 @@ class frongo(object):
             self.is_fremen_active=True
             #self.create_models()
 
+
+    def rebuild_all_models_cb(self, req):
+        """    
+         This function creates the models when the service is called
+        """
+        resp=False
+        if self.is_fremen_active:
+            for i in self.models:
+                i._create_fremen_models()
+                print i.name, i.order
+            resp=True
+            str_msg="All Done"
+        else:
+            resp=False
+            str_msg="No fremenserver"
+        
+        return resp, str_msg
 
     def predict_cb(self, req):
         epochs =[]
@@ -168,20 +189,27 @@ class frongo(object):
     def create_models(self, data):
         print data
         for i in data:
+            #print i
             val=TModels(i['model']['name'])
             val._set_props_from_dict(i['model'])
             self.models.append(val)
 
         for i in self.models:
+            print "-------------------------------------"
+            print i
             self.set_model_states(i)
+
 
     def set_model_states(self, model):
         db=self.mongo_client[model.db]
-        collection=db[model.collection]        
+        collection=db[model.collection]
         query = json.loads(model.query)
-        available = collection.find(query)        
-        for i in available:
-            model._add_entry(i)
+        available = collection.find(query)
+        if available:
+            for i in available:
+                model._add_entry(i)
+        else:
+            model._set_unknown(True)
 
     def graph_model_build_cb(self, req):
         self.graph_model_construction(req)
