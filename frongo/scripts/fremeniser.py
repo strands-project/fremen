@@ -38,6 +38,8 @@ class frongo(object):
         rospy.on_shutdown(self._on_node_shutdown)
         host = rospy.get_param("mongodb_host")
         port = rospy.get_param("mongodb_port")
+        
+        rospy.loginfo("Setting up Mongo client on %s:%d" %(host,port))
         self.mongo_client = pymongo.MongoClient(host, port)
 
         if data:
