@@ -333,8 +333,8 @@ int test()
 
 int main(int argc,char* argv[])
 {
-	test();
-	return 0;
+//	test();
+//	return 0;
 	ros::init(argc, argv, "fremenserver");
 	n = new ros::NodeHandle();
 	server = new Server(*n, "/fremenserver", boost::bind(&actionServerCallback, _1, server), false);
