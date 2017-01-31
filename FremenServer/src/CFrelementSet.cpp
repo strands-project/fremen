@@ -26,6 +26,18 @@ int CFrelementSet::add(const char *name,uint32_t times[],float states[],int leng
 	return active->add(times,states,length);
 }
 
+int CFrelementSet::addNovel(const char *name,uint32_t times[],float states[],int length,int predictionOrder)
+{
+	bool exists = find(name);
+	if (exists == false){
+		frelements[numFrelements++] = new CFrelement(name);
+		activeIndex = numFrelements-1;
+		active = frelements[numFrelements-1];
+	}
+	//printf("Add %i %s \n",activeIndex,active->id);
+	return active->addNovel(times,states,length,predictionOrder);
+}
+
 int CFrelementSet::evaluate(const char *name,uint32_t times[],unsigned char states[],int length,int order,float errors[])
 {
 	if (find(name) == false) return -1;
