@@ -79,6 +79,28 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			server->setAborted(result);
 		}
 	}
+	else if (goal->operation == "addnovel")
+	{
+		if (goal->times.size() == goal->states.size()){
+			float values[goal->states.size()];
+			for (int i=0;i<goal->states.size();i++) if (goal->states[i]) values[i] = 1; else values[i] = 0;
+			result.success = frelements.addNovel(goal->id.c_str(),(uint32_t*)goal->times.data(),values,(int)goal->states.size());
+			if (result.success >=0)
+			{
+				mess << "Added " << result.success << " of the " << (int)goal->states.size() << " provided measurements to the state " << goal->id;
+				result.message = mess.str(); 
+			}else{
+				mess << "A new state " <<  goal->id << " was added to the collection and filled with "  << (int)goal->states.size() << " measurements.";
+				result.message = mess.str(); 
+			}
+			server->setSucceeded(result);
+		}else{
+			mess << "The length of the 'states' and 'times' arrays does not match.";
+			result.message = mess.str(); 
+			result.success = -2;
+			server->setAborted(result);
+		}
+	}
 	else if (goal->operation == "addvalues")
 	{
 		if (goal->times.size() == goal->values.size()){
@@ -278,26 +300,31 @@ int test()
 	float 		state[100000];
 	float 		probsA[100000];
 	float 		probsB[100000];
-	int len = 7*24*60;
+	int len = 0;
 	FILE* file = fopen("input.txt","r");
-	int dummy=0;
-	int dummy2=0;
-	for (int i = 0;i<len;i++)
+	int dummy0=0;
+	int dummy1=0;
+	int dummy2=2;
+	while (feof(file)==0)
 	{
-		dummy2 = fscanf(file,"%i\n",&dummy);
-		state[i] = dummy;
-		times[i] = 60*i;
+		dummy2 = fscanf(file,"%i %i\n",&dummy0,&dummy1);
+		state[len] = dummy0;
+		times[len] = dummy1;
+		//frelements.addNovel("A",&times[len],&state[len],1);
+		frelements.print(true);
+		len++;
 	}
 	fclose(file);
+	frelements.addNovel("A",times,state,len);
+	//frelements.print(true);
 
-	frelements.add("A",times,state,len);
-	frelements.estimate("A",times,probsA,len,2);
+	frelements.estimate("A",times,probsA,len,5);
 
-	int granul = 7;
+	/*int granul = 7;
 	for (int i = 0;i<2;i++) frelements.add("B",&times[i*len/granul],&state[i*len/granul],len/granul);
-	for (int i = 0;i<granul;i++) frelements.estimate("B",&times[i*len/granul],&probsB[i*len/granul],len/granul,2);
+	for (int i = 0;i<granul;i++) frelements.estimate("B",&times[i*len/granul],&probsB[i*len/granul],len/granul,2);*/
 
-	frelements.print(true);
+	frelements.print(5);
 	file = fopen("output.txt","w");
 	
 	for (int i = 0;i<len;i++)fprintf(file,"%.3f %.3f %.3f\n",state[i],probsA[i],probsB[i]);
@@ -306,8 +333,8 @@ int test()
 
 int main(int argc,char* argv[])
 {
-	//test();
-	//return 0;
+	test();
+	return 0;
 	ros::init(argc, argv, "fremenserver");
 	n = new ros::NodeHandle();
 	server = new Server(*n, "/fremenserver", boost::bind(&actionServerCallback, _1, server), false);

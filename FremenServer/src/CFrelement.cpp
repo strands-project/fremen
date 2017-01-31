@@ -2,6 +2,7 @@
 
 using namespace std;
 static bool debug = false; 
+static float minSurpriseProbability = 0.01;
 
 int fremenSort(const void* i,const void* j) 
 {
@@ -17,6 +18,7 @@ CFrelement::CFrelement(const char* name)
 	for (int i=0;i<NUM_PERIODICITIES;i++) frelements[i].amplitude = frelements[i].phase = 0; 
 	for (int i=0;i<NUM_PERIODICITIES;i++) frelements[i].period = (7*24*3600)/(i+1); 
 	gain = 0.5;
+	rate = 3*3600;
 	firstTime = -1;
 	lastTime = -1;
 	measurements = 0;
@@ -26,6 +28,86 @@ CFrelement::~CFrelement()
 {
 }
 
+int CFrelement::addNovel(uint32_t times[],float states[],int length,int predictionOrder)
+{
+	float weight = 1.0;
+	if (measurements == 0 && length > 0)
+	{
+		for (int i = 0;i<NUM_PERIODICITIES;i++){
+			frelements[i].realStates = 0;
+			frelements[i].imagStates = 0;
+		}
+		firstTime = times[0];
+	}
+
+	int duration = times[length-1]-firstTime;
+	int firstIndex = 0;
+
+	//discard already known observations 
+	for (int i=0;i<length;i++)if (times[i] <= lastTime)firstIndex++;
+	int numUpdated = length-firstIndex;
+
+	//verify if there is an actual update
+	if (numUpdated <= 0) return numUpdated;
+
+	for (int j = firstIndex;j<length;j++)
+	{
+		float prob = 0;
+		float oldGain=0;
+		estimate(&times[j],&prob,1,predictionOrder);
+		//float proba=prob;
+		//if (states[j] == 0) prob = 1-prob;
+		//if (prob > minSurpriseProbability) weight = -log(prob); else weight = -log(minSurpriseProbability);
+		weight = sqrt(fabs(states[j]-prob));
+		//printf("Data: %d %.3f %.3f %.3f\n",times[j],states[j],proba,weight);
+		gain = (gain*measurements+weight*states[j])/(measurements+weight);
+
+		lastTime = times[j];
+		lastState = states[j];
+
+		//recalculate spectral balance - this is beneficial is the process period does not match the length of the data
+		if (oldGain > 0){
+			for (int i = 0;i<NUM_PERIODICITIES;i++)
+			{
+				frelements[i].realBalance  = gain*frelements[i].realBalance/oldGain;
+				frelements[i].imagBalance  = gain*frelements[i].imagBalance/oldGain;
+			}
+		}else{
+			for (int i = 0;i<NUM_PERIODICITIES;i++)
+			{
+				frelements[i].realBalance  = 0;
+				frelements[i].imagBalance  = 0;
+			}
+		}
+
+		//recalculate the spectrum 
+		float angle = 0;
+		for (int i = 0;i<NUM_PERIODICITIES;i++)
+		{
+			angle = 2*M_PI*(float)times[j]/frelements[i].period;
+			frelements[i].realStates   += weight*states[j]*cos(angle);
+			frelements[i].imagStates   += weight*states[j]*sin(angle);
+			frelements[i].realBalance  += weight*gain*cos(angle);
+			frelements[i].imagBalance  += weight*gain*sin(angle);
+		}
+		measurements+=weight;
+
+		//establish amplitudes and phase shifts
+		float re,im;
+		for (int i = 0;i<NUM_PERIODICITIES;i++)
+		{
+			re = frelements[i].realStates-frelements[i].realBalance;
+			im = frelements[i].imagStates-frelements[i].imagBalance;
+			if (1.5*frelements[i].period <= duration) frelements[i].amplitude = sqrt(re*re+im*im)/measurements; else frelements[i].amplitude = 0;
+			if (frelements[i].amplitude < FREMEN_AMPLITUDE_THRESHOLD) frelements[i].amplitude = 0;
+			//frelements[i].amplitude = sqrt(re*re+im*im)/measurements;
+			frelements[i].phase = atan2(im,re);
+		}
+		//sort the spectral components
+		qsort(frelements,NUM_PERIODICITIES,sizeof(SFrelement),fremenSort);
+	}
+	return numUpdated; 
+}
 // adds new state observations at given times
 int CFrelement::add(uint32_t times[],float states[],int length)
 {
@@ -163,6 +245,7 @@ int CFrelement::estimate(uint32_t times[],float probs[],int length,int orderi)
 		time = times[j];
 		estimate = gain;
 		for (int i = 0;i<orderi;i++) estimate+=2*frelements[i].amplitude*cos(time/frelements[i].period*2*M_PI-frelements[i].phase);
+		estimate += ((float)lastState - estimate)*exp(-fabs(times[j]-lastTime)/rate);
 		if (estimate > 1.0) estimate =  1.0;
 		if (estimate < 0.0) estimate =  0.0;
 		probs[j]=estimate;
