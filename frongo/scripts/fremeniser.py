@@ -9,6 +9,8 @@ import numpy as np
 
 import std_msgs
 
+from threading import Lock
+
 from std_srvs.srv import Trigger
 from frongo.temporal_models import *
 from frongo.graph_models import *
@@ -38,6 +40,7 @@ class frongo(object):
         rospy.on_shutdown(self._on_node_shutdown)
         host = rospy.get_param("mongodb_host")
         port = rospy.get_param("mongodb_port")
+        self.srv_lock=Lock()
         
         rospy.loginfo("Setting up Mongo client on %s:%d" %(host,port))
         self.mongo_client = pymongo.MongoClient(host, port)
@@ -71,43 +74,46 @@ class frongo(object):
 
 
     def get_states_cb(self, req):
-        if len(req.epochs) < 2:
-            rospy.logwarn("Size of epochs requested is less than two. Returning all epochs")
-        
-        for i in self.models:
-            if i.name == req.model_name:
-                epochs, predictions = i._get_states(req.epochs)
+        with self.srv_lock:
+            if len(req.epochs) < 2:
+                rospy.logwarn("Size of epochs requested is less than two. Returning all epochs")
+            
+            for i in self.models:
+                if i.name == req.model_name:
+                    epochs, predictions = i._get_states(req.epochs)
        
         return epochs, predictions
         
 
 
     def get_model_info_cb(self, req):
-        names=[]
-        info=[]
-        for i in self.models:
-            names.append(i.name)
-            info.append(i._get_info())
+        with self.srv_lock:
+            names=[]
+            info=[]
+            for i in self.models:
+                names.append(i.name)
+                info.append(i._get_info())
 
         return names, info        
 
 
     def add_model_cb(self, req):
-        data=[]
-        print req.model_def
-        datum = yaml.load(req.model_def)
-        print datum
-        if not isinstance(datum, list):
-            data.append(datum)
-        else:
-            data=datum
-            
-        self.create_models(data)
-
-        if self.is_fremen_active:
-            for i in self.models:
-                print i
-                i._create_fremen_models()            
+        with self.srv_lock:
+            data=[]
+            print req.model_def
+            datum = yaml.load(req.model_def)
+            print datum
+            if not isinstance(datum, list):
+                data.append(datum)
+            else:
+                data=datum
+                
+            self.create_models(data)
+    
+            if self.is_fremen_active:
+                for i in self.models:
+                    print i
+                    i._create_fremen_models()
         return True
 
 
@@ -118,10 +124,11 @@ class frongo(object):
         """
         if msg.data:
             rospy.logwarn("FREMENSERVER restart detected will generate new models now")
-            for i in self.models:
-                i._create_fremen_models()
-                print i.name, i.order
-            self.is_fremen_active=True
+            with self.srv_lock:
+                for i in self.models:
+                    i._create_fremen_models()
+                    print i.name, i.order
+                self.is_fremen_active=True
             #self.create_models()
 
 
@@ -129,61 +136,66 @@ class frongo(object):
         """    
          This function creates the models when the service is called
         """
-        resp=False
-        if self.is_fremen_active:
-            for i in self.models:
-                i._create_fremen_models()
-                print i.name, i.order
-            resp=True
-            str_msg="All Done"
-        else:
+        with self.srv_lock:
             resp=False
-            str_msg="No fremenserver"
+            if self.is_fremen_active:
+                for i in self.models:
+                    i._create_fremen_models()
+                    print i.name, i.order
+                resp=True
+                str_msg="All Done"
+            else:
+                resp=False
+                str_msg="No fremenserver"
         
         return resp, str_msg
 
     def predict_cb(self, req):
-        epochs =[]
-        for i in req.epochs:
-            epochs.append(i)
-
-        for i in self.models:
-            if i.name == req.model_name:
-                predictions = i._predict_outcome(epochs)
+        with self.srv_lock:
+            epochs =[]
+            for i in req.epochs:
+                epochs.append(i)
+    
+            for i in self.models:
+                if i.name == req.model_name:
+                    predictions = i._predict_outcome(epochs)
        
         return epochs, predictions
 
     def predict_entropy_cb(self, req):
-        epochs =[]
-        for i in req.epochs:
-            epochs.append(i)
-
-        for i in self.models:
-            if i.name == req.model_name:
-                predictions = i._predict_entropy(epochs)
+        with self.srv_lock:
+            epochs =[]
+            for i in req.epochs:
+                epochs.append(i)
+    
+            for i in self.models:
+                if i.name == req.model_name:
+                    predictions = i._predict_entropy(epochs)
        
         return epochs, predictions
 
 
     def predict_order_cb(self, req):
-        epochs =[]
-        for i in req.epochs:
-            epochs.append(i)
-
-        for i in self.models:
-            if i.name == req.model_name:
-                predictions = i._predict_outcome(epochs, order=req.order)
+        with self.srv_lock:
+            epochs =[]
+            for i in req.epochs:
+                epochs.append(i)
+    
+            for i in self.models:
+                if i.name == req.model_name:
+                    predictions = i._predict_outcome(epochs, order=req.order)
        
         return epochs, predictions
 
     def predict_entropy_order_cb(self, req):
-        epochs =[]
-        for i in req.epochs:
-            epochs.append(i)
-
-        for i in self.models:
-            if i.name == req.model_name:
-                predictions = i._predict_entropy(epochs, order=req.order)
+        with self.srv_lock:
+            epochs =[]
+            for i in req.epochs:
+                epochs.append(i)
+    
+            for i in self.models:
+                if i.name == req.model_name:
+                    predictions = i._predict_entropy(epochs, order=req.order)
        
         return epochs, predictions
 
