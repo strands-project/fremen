@@ -156,9 +156,15 @@ class frongo(object):
             for i in req.epochs:
                 epochs.append(i)
     
+            model_found=False
             for i in self.models:
                 if i.name == req.model_name:
                     predictions = i._predict_outcome(epochs)
+                    model_found=True
+                    
+        if not model_found:
+            rospy.logerr("Frongo: Model %s Not Found" %req.model_name)
+            return epochs, [-1] * len(epochs)
        
         return epochs, predictions
 
@@ -167,10 +173,16 @@ class frongo(object):
             epochs =[]
             for i in req.epochs:
                 epochs.append(i)
-    
+
+            model_found=False    
             for i in self.models:
                 if i.name == req.model_name:
                     predictions = i._predict_entropy(epochs)
+                    model_found=True
+
+        if not model_found:
+            rospy.logerr("Frongo: Model %s Not Found" %req.model_name)
+            return epochs, [-1] * len(epochs)
        
         return epochs, predictions
 
@@ -180,10 +192,16 @@ class frongo(object):
             epochs =[]
             for i in req.epochs:
                 epochs.append(i)
-    
+
+            model_found=False    
             for i in self.models:
                 if i.name == req.model_name:
                     predictions = i._predict_outcome(epochs, order=req.order)
+                    model_found=True
+
+        if not model_found:
+            rospy.logerr("Frongo: Model %s Not Found" %req.model_name)
+            return epochs, [-1] * len(epochs)
        
         return epochs, predictions
 
@@ -196,11 +214,17 @@ class frongo(object):
             for i in self.models:
                 if i.name == req.model_name:
                     predictions = i._predict_entropy(epochs, order=req.order)
-       
+
+        if not model_found:
+            rospy.logerr("Frongo: Model %s Not Found" %req.model_name)
+            return epochs,  [-1] * len(epochs)
+            
         return epochs, predictions
 
 
     def create_models(self, data):
+        rospy.loginfo("Creating Temporal Models:")
+        rospy.loginfo("%s" %data)
         print data
         for i in data:
             #print i
