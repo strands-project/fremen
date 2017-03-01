@@ -123,7 +123,10 @@ class TModels(object):
         return state
         
     def _create_fremen_models(self):
-        self.order = self._fremen.create_fremen_model(self.name, self.epochs, self.states, self.data_type)
+        if not self.unknown:
+            self.order = self._fremen.create_fremen_model(self.name, self.epochs, self.states, self.data_type)
+        else:
+            self.order = 0
 
 
     def _predict_outcome(self, epochs, order=-1):
@@ -187,9 +190,10 @@ class TModels(object):
             if type(self.__getattribute__(i)) is not list:
                 s[str(i)] =  self.__getattribute__(i)
             else:
-                st= '[list with ' + str(len(self.__getattribute__(i))) +' ' + str(type(self.__getattribute__(i)[0])) + ' elements]'
-                s[str(i)] = st
-        
+                if not self.unknown:
+                    st= '[list with ' + str(len(self.__getattribute__(i))) +' ' + str(type(self.__getattribute__(i)[0])) + ' elements]'
+                    s[str(i)] = st
+                           
         out=yaml.safe_dump(s,default_flow_style=False)
         return out
 
