@@ -151,6 +151,7 @@ int CFrelement::detect(uint32_t *times,float *probs,int length,int order,float c
 		probs[i] = estimates[i];
 	}
 	delete estimates;
+	return anomCount;
 }
 
 

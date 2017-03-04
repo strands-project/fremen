@@ -57,14 +57,10 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 	}
 	else if (goal->operation == "detect")
 	{
-		if (goal->times.size() == goal->states.size()){
-			float values[goal->states.size()];
-			for (int i=0;i<goal->states.size();i++){
-				if (goal->states[i]) values[i] = 1; else values[i] = 0;
-			}
+		if (goal->times.size() == goal->values.size()){
 			float anomVals[goal->states.size()];
 			uint32_t anomTimes[goal->states.size()];
-			result.success = frelements.detect(goal->id.c_str(),(uint32_t*)goal->times.data(),values,(int)goal->states.size(),goal->order,goal->confidence,anomTimes,anomVals);
+			result.success = frelements.detect(goal->id.c_str(),(uint32_t*)goal->times.data(),(float*)goal->values.data(),(int)goal->states.size(),goal->order,goal->confidence,anomTimes,anomVals);
 			if (result.success >=0)
 			{
 				mess << "Detected " << result.success << " anomalies in " << (int)goal->states.size() << " provided measurements to the state " << goal->id;
@@ -73,6 +69,8 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 				mess << "The state " <<  goal->id << " does not exist in the collection of states.";
 				result.message = mess.str(); 
 			}
+			result.anomalyTimes.assign(anomTimes,anomTimes + result.success);
+			result.anomalyValues.assign(anomVals,anomVals + result.success);
 			server->setSucceeded(result);
 		}else{
 			mess << "The length of the 'states' and 'times' arrays does not match.";
