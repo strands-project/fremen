@@ -135,6 +135,24 @@ int CFrelement::evaluate(uint32_t* times,unsigned char* signal,int length,int or
 	return index;
 }
 
+int CFrelement::detect(uint32_t *times,float *probs,int length,int order,float confidence,uint32_t *anomTimes,float *anomVals)
+{
+	float *estimates = (float*)malloc(length*sizeof(float));
+	estimate(times,estimates,length,order);
+	int anomCount = 0;
+	for (int i = 0;i<length;i++)
+	{
+		if (fabs(probs[i] - estimates[i]) >=confidence)
+		{
+			anomTimes[anomCount] = times[i];
+			anomVals[anomCount] = probs[i];
+			anomCount++;
+		}
+		probs[i] = estimates[i];
+	}
+	delete estimates;
+}
+
 
 /*not required in incremental version*/
 void CFrelement::update(int modelOrder)

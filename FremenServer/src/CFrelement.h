@@ -47,6 +47,8 @@ class CFrelement
 		//evaluates the error of the predictions for the given times and measurements
 		int evaluate(uint32_t* times,unsigned char* signal,int length,int orderi,float* evals);
 	
+		//performs anomaly detection on the data provided 
+		int detect(uint32_t *times,float *probs,int length,int order,float confidence,uint32_t *anomTimes,float *anomVals);
 		void update(int modelOrder);
 		void print(int order);
 
