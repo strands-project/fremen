@@ -1,0 +1,5 @@
+string model_name
+float64 confidence
+---
+uint32[] epochs
+float64[] values

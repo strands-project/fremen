@@ -98,3 +98,19 @@ Deletes a state with a given **id** from the state collection held in the server
 
 ###The 'update' operation 
 Reserved for future use when FreMEn is fused with Gaussian Mixture Models.
+
+###The 'detect' operation (TODO)
+The **detect** operation is meant to detect anomalous observations based on their discrepancy with the model of **order** given a **confidence** level. The user provides a sequence of observed **values** and **times** of observations of a state **id**, model **order** and a **confidence** level. The server performs predictions for the given **times** and **orders**, compares those predictions with the provided **values** and returns **anomTimes**, when the observed states did not match the predictions on a given confidence **level**. Anomaly is defined as a situation where |p(t)-s(t)| > c, where *p(t)* is the prediction, *s(t)* is the observation and *c* is the confidence level.
+
+####Inputs
+- **id** identification of the state that is concerned. If the **id** did not exist, an error is reported.
+- **values** is a sequence of zeros and ones indicating the observed states at  
+- **times** which are in seconds. The length of the fields **times** and **values** has to be the same.
+- **order** is the model order to be used for predictions, 
+- **confidence** is the confidence level considered. 
+
+####Outputs
+- **anomTimes** contains the times of detected anomalies,
+- **anomValues** contains the values of detected anomalies,
+- **values** contains the values predicted for the given **times**,
+- **message** contains a detailed report or an error message.

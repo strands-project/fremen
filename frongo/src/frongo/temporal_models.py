@@ -25,10 +25,15 @@ class TModels(object):
         self.timestamp_field = timestamp_field
         self.timestamp_type = timestamp_type
         self.order = -1
+
         self.epochs=[]
         self.states=[]
+        self.anomalyTimes=[]
+        self.anomalyValues=[]
+
         self._set_data_configuration()
         self._fremen = fremen_interface()
+
         if self.data_type == 'boolean':
             self.min_value=False
             self.max_value=True
@@ -123,7 +128,16 @@ class TModels(object):
         return state
         
     def _create_fremen_models(self):
-        self.order = self._fremen.create_fremen_model(self.name, self.epochs, self.states, self.data_type)
+        if not self.unknown:
+            self.order = self._fremen.create_fremen_model(self.name, self.epochs, self.states, self.data_type)
+        else:
+            self.order = 0
+
+    def _detect_annomalies(self, confidence):
+        if not self.unknown:
+            self.anomalyTimes, self.anomalyValues = self._fremen.detect_annomalies(self.name, self.epochs, self.states, self.order, confidence)
+        return self.anomalyTimes, self.anomalyValues
+        
 
 
     def _predict_outcome(self, epochs, order=-1):
@@ -187,9 +201,10 @@ class TModels(object):
             if type(self.__getattribute__(i)) is not list:
                 s[str(i)] =  self.__getattribute__(i)
             else:
-                st= '[list with ' + str(len(self.__getattribute__(i))) +' ' + str(type(self.__getattribute__(i)[0])) + ' elements]'
-                s[str(i)] = st
-        
+                if not self.unknown:
+                    st= '[list with ' + str(len(self.__getattribute__(i))) +' ' + str(type(self.__getattribute__(i)[0])) + ' elements]'
+                    s[str(i)] = st
+                           
         out=yaml.safe_dump(s,default_flow_style=False)
         return out
 

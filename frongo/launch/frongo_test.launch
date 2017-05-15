@@ -8,7 +8,7 @@
 
   <node pkg="fremenserver" type="fremenserver" name="fremenserver" respawn="true"/>
   
-  <node pkg="frongo" type="fremeniser.py" name="fremeniser1" respawn="true" unless="$(arg with_defs_file)"/>
-  <node pkg="frongo" type="fremeniser.py" name="fremeniser2" respawn="true" args="-yaml_defs $(arg defs_file)" if="$(arg with_defs_file)"/>
+  <!--<node pkg="frongo" type="fremeniser.py" name="fremeniser1" respawn="true" unless="$(arg with_defs_file)"/>-->
+  <node pkg="frongo" type="fremeniser.py" name="fremeniser" respawn="true" args="-yaml_defs $(arg defs_file)" if="$(arg with_defs_file)"/>
 
 </launch>

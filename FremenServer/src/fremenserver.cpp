@@ -55,6 +55,30 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			server->setAborted(result);
 		}
 	}
+	else if (goal->operation == "detect")
+	{
+		if (goal->times.size() == goal->values.size()){
+			float anomVals[goal->values.size()];
+			uint32_t anomTimes[goal->values.size()];
+			result.success = frelements.detect(goal->id.c_str(),(uint32_t*)goal->times.data(),(float*)goal->values.data(),(int)goal->values.size(),goal->order,goal->confidence,anomTimes,anomVals);
+			if (result.success >=0)
+			{
+				mess << "Detected " << result.success << " anomalies in " << (int)goal->values.size() << " provided measurements to the state " << goal->id;
+				result.message = mess.str(); 
+			}else{
+				mess << "The state " <<  goal->id << " does not exist in the collection of states.";
+				result.message = mess.str(); 
+			}
+			result.anomalyTimes.assign(anomTimes,anomTimes + result.success);
+			result.anomalyValues.assign(anomVals,anomVals + result.success);
+			server->setSucceeded(result);
+		}else{
+			mess << "The length of the 'states' and 'times' arrays does not match.";
+			result.message = mess.str(); 
+			result.success = -2;
+			server->setAborted(result);
+		}
+	}
 	else if (goal->operation == "add")
 	{
 		if (goal->times.size() == goal->states.size()){
@@ -117,6 +141,7 @@ void actionServerCallback(const fremenserver::FremenGoalConstPtr& goal, Server* 
 			}
 		}else{
 			mess << "The length of the 'states' and 'times' arrays does not match.";
+			result.message = mess.str(); 
 			result.success = -2;
 			server->setAborted(result);
 		}
