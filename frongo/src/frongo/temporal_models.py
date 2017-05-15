@@ -202,7 +202,11 @@ class TModels(object):
                 s[str(i)] =  self.__getattribute__(i)
             else:
                 if not self.unknown:
-                    st= '[list with ' + str(len(self.__getattribute__(i))) +' ' + str(type(self.__getattribute__(i)[0])) + ' elements]'
+                    if len(self.__getattribute__(i)) > 0:
+                        st= '[list with ' + str(len(self.__getattribute__(i))) +' ' + str(type(self.__getattribute__(i)[0])) + ' elements]'
+                    else:
+                        st= '[list with 0 elements]'
+
                     s[str(i)] = st
                            
         out=yaml.safe_dump(s,default_flow_style=False)
