@@ -215,9 +215,11 @@ class frongo(object):
             for i in req.epochs:
                 epochs.append(i)
     
+            model_found=False
             for i in self.models:
                 if i.name == req.model_name:
                     predictions = i._predict_entropy(epochs, order=req.order)
+                    model_found=True
 
         if not model_found:
             rospy.logerr("Frongo: Model %s Not Found" %req.model_name)
