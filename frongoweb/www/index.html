@@ -40,7 +40,12 @@ $var title: Frongo.
 						    <option value="2">2</option>
 						    <option value="3">3</option>
 						    <option value="4">4</option>
+						    <option value="5">5</option>
 						  </select>
+					</div>
+					<div class="input-group">
+						<label for="anom_conf">Anomaly Confidence: </label><p/>
+						<input type="text" class="span2" value="1.0" data-slider-min="0" data-slider-max="1" data-slider-step=".05" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show" id="anom_conf">
 					</div>
 					
 
@@ -173,6 +178,7 @@ $var title: Frongo.
 					model: $$("#model").val(),
 					epoch_from: $$("#from").val(),
 					epoch_to: $$("#to").val(),
+					confidence: $$("#anom_conf").val(),
 					order: $$("#order").val(),
 				}, function (data) {
 		     	console.log(data)
@@ -214,11 +220,16 @@ $var title: Frongo.
 
 		$$(document).ready(function () {
 
+			  $$("#anom_conf").slider().on('slideStop', function(ev){
+			  	query();
+			  });;
+
 				Chart.defaults.global.responsive = true;
 				if ("$data['def_model']" != "") {
 					$$("#model").html("$data['def_model']" + ' <span class="caret"></span>');
 					$$("#model").val("$data['def_model']");
 					$$("#order").val("$data['def_order']");
+					$$("#anom_conf").val("$data['anom_conf']");
 				} else {
 					choose_model($$(".dropdown-menu li a:first"));
 				}
