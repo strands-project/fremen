@@ -9,6 +9,8 @@ import numpy as np
 
 import std_msgs
 
+from threading import Lock
+
 from std_srvs.srv import Trigger
 from frongo.temporal_models import *
 from frongo.graph_models import *
@@ -17,6 +19,9 @@ from frongo.srv import PredictStateOrder
 from frongo.srv import GraphModel
 from frongo.srv import GetInfo
 from frongo.srv import AddModel
+from frongo.srv import DetectAnnomalies
+
+
 
 def load_yaml(filename):
     data=[]
@@ -38,6 +43,9 @@ class frongo(object):
         rospy.on_shutdown(self._on_node_shutdown)
         host = rospy.get_param("mongodb_host")
         port = rospy.get_param("mongodb_port")
+        self.srv_lock=Lock()
+        
+        rospy.loginfo("Setting up Mongo client on %s:%d" %(host,port))
         self.mongo_client = pymongo.MongoClient(host, port)
 
         if data:
@@ -61,6 +69,7 @@ class frongo(object):
         self.new_model_srv=rospy.Service('/frongo/add_model_defs', AddModel, self.add_model_cb)
         self.info_srv=rospy.Service('/frongo/get_models', GetInfo, self.get_model_info_cb)
         self.rebuild_srv=rospy.Service('/frongo/rebuild_all_models', Trigger, self.rebuild_all_models_cb)
+        self.detect_annomalies=rospy.Service('/frongo/detect_annomalies', DetectAnnomalies, self.detect_annomalies_cb)       
         
         #self.graph_model_construction()
         rospy.loginfo("All Done ...")
@@ -69,43 +78,46 @@ class frongo(object):
 
 
     def get_states_cb(self, req):
-        if len(req.epochs) < 2:
-            rospy.logwarn("Size of epochs requested is less than two. Returning all epochs")
-        
-        for i in self.models:
-            if i.name == req.model_name:
-                epochs, predictions = i._get_states(req.epochs)
+        with self.srv_lock:
+            if len(req.epochs) < 2:
+                rospy.logwarn("Size of epochs requested is less than two. Returning all epochs")
+            
+            for i in self.models:
+                if i.name == req.model_name:
+                    epochs, predictions = i._get_states(req.epochs)
        
         return epochs, predictions
         
 
 
     def get_model_info_cb(self, req):
-        names=[]
-        info=[]
-        for i in self.models:
-            names.append(i.name)
-            info.append(i._get_info())
+        with self.srv_lock:
+            names=[]
+            info=[]
+            for i in self.models:
+                names.append(i.name)
+                info.append(i._get_info())
 
         return names, info        
 
 
     def add_model_cb(self, req):
-        data=[]
-        print req.model_def
-        datum = yaml.load(req.model_def)
-        print datum
-        if not isinstance(datum, list):
-            data.append(datum)
-        else:
-            data=datum
-            
-        self.create_models(data)
-
-        if self.is_fremen_active:
-            for i in self.models:
-                print i
-                i._create_fremen_models()            
+        with self.srv_lock:
+            data=[]
+            print req.model_def
+            datum = yaml.load(req.model_def)
+            print datum
+            if not isinstance(datum, list):
+                data.append(datum)
+            else:
+                data=datum
+                
+            self.create_models(data)
+    
+            if self.is_fremen_active:
+                for i in self.models:
+                    print i
+                    i._create_fremen_models()
         return True
 
 
@@ -116,10 +128,11 @@ class frongo(object):
         """
         if msg.data:
             rospy.logwarn("FREMENSERVER restart detected will generate new models now")
-            for i in self.models:
-                i._create_fremen_models()
-                print i.name, i.order
-            self.is_fremen_active=True
+            with self.srv_lock:
+                for i in self.models:
+                    i._create_fremen_models()
+                    print i.name, i.order
+                self.is_fremen_active=True
             #self.create_models()
 
 
@@ -127,66 +140,97 @@ class frongo(object):
         """    
          This function creates the models when the service is called
         """
-        resp=False
-        if self.is_fremen_active:
-            for i in self.models:
-                i._create_fremen_models()
-                print i.name, i.order
-            resp=True
-            str_msg="All Done"
-        else:
+        with self.srv_lock:
             resp=False
-            str_msg="No fremenserver"
+            if self.is_fremen_active:
+                for i in self.models:
+                    i._create_fremen_models()
+                    print i.name, i.order
+                resp=True
+                str_msg="All Done"
+            else:
+                resp=False
+                str_msg="No fremenserver"
         
         return resp, str_msg
 
     def predict_cb(self, req):
-        epochs =[]
-        for i in req.epochs:
-            epochs.append(i)
-
-        for i in self.models:
-            if i.name == req.model_name:
-                predictions = i._predict_outcome(epochs)
+        with self.srv_lock:
+            epochs =[]
+            for i in req.epochs:
+                epochs.append(i)
+    
+            model_found=False
+            for i in self.models:
+                if i.name == req.model_name:
+                    predictions = i._predict_outcome(epochs)
+                    model_found=True
+                    
+        if not model_found:
+            rospy.logerr("Frongo: Model %s Not Found" %req.model_name)
+            return epochs, [-1] * len(epochs)
        
         return epochs, predictions
 
     def predict_entropy_cb(self, req):
-        epochs =[]
-        for i in req.epochs:
-            epochs.append(i)
+        with self.srv_lock:
+            epochs =[]
+            for i in req.epochs:
+                epochs.append(i)
 
-        for i in self.models:
-            if i.name == req.model_name:
-                predictions = i._predict_entropy(epochs)
+            model_found=False    
+            for i in self.models:
+                if i.name == req.model_name:
+                    predictions = i._predict_entropy(epochs)
+                    model_found=True
+
+        if not model_found:
+            rospy.logerr("Frongo: Model %s Not Found" %req.model_name)
+            return epochs, [-1] * len(epochs)
        
         return epochs, predictions
 
 
     def predict_order_cb(self, req):
-        epochs =[]
-        for i in req.epochs:
-            epochs.append(i)
+        with self.srv_lock:
+            epochs =[]
+            for i in req.epochs:
+                epochs.append(i)
 
-        for i in self.models:
-            if i.name == req.model_name:
-                predictions = i._predict_outcome(epochs, order=req.order)
+            model_found=False    
+            for i in self.models:
+                if i.name == req.model_name:
+                    predictions = i._predict_outcome(epochs, order=req.order)
+                    model_found=True
+
+        if not model_found:
+            rospy.logerr("Frongo: Model %s Not Found" %req.model_name)
+            return epochs, [-1] * len(epochs)
        
         return epochs, predictions
 
     def predict_entropy_order_cb(self, req):
-        epochs =[]
-        for i in req.epochs:
-            epochs.append(i)
+        with self.srv_lock:
+            epochs =[]
+            for i in req.epochs:
+                epochs.append(i)
+    
+            model_found=False
+            for i in self.models:
+                if i.name == req.model_name:
+                    predictions = i._predict_entropy(epochs, order=req.order)
+                    model_found=True
 
-        for i in self.models:
-            if i.name == req.model_name:
-                predictions = i._predict_entropy(epochs, order=req.order)
-       
+        if not model_found:
+            rospy.logerr("Frongo: Model %s Not Found" %req.model_name)
+            return epochs,  [-1] * len(epochs)
+            
         return epochs, predictions
 
 
     def create_models(self, data):
+        rospy.loginfo("Creating Temporal Models:")
+        rospy.loginfo("%s" %data)
         print data
         for i in data:
             #print i
@@ -214,6 +258,22 @@ class frongo(object):
     def graph_model_build_cb(self, req):
         self.graph_model_construction(req)
         return "Done"        
+
+    def detect_annomalies_cb(self, req):
+        model_found=False
+        with self.srv_lock:
+            for i in self.models:
+                if i.name == req.model_name:
+                    print "Detecting annomalies over: "+str(req.confidence)+" for "+req.model_name
+                    epochs, values = i._detect_annomalies(req.confidence)
+                    model_found=True
+
+        if not model_found:
+            rospy.logerr("Frongo: Model %s Not Found" %req.model_name)
+            return [0],[-1]
+            
+        return epochs, values
+
 
     def graph_model_construction(self, req):
         for i in self.models:

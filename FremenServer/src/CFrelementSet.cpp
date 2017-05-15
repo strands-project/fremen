@@ -32,6 +32,12 @@ int CFrelementSet::evaluate(const char *name,uint32_t times[],unsigned char stat
 	return active->evaluate(times,states,length,order,errors);;
 }
 
+int CFrelementSet::detect(const char *name,uint32_t times[],float probs[],int length,int order,float confidence,uint32_t anomTimes[],float anomVals[])
+{
+	if (find(name) == false)return -1;
+	return active->detect(times,probs,length,order,confidence,anomTimes,anomVals);
+}
+
 int CFrelementSet::estimate(const char *name,uint32_t times[],float probs[],int length,int order)
 {
 	if (find(name) == false)return -1;
