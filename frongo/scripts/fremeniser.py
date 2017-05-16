@@ -19,8 +19,17 @@ from frongo.srv import PredictStateOrder
 from frongo.srv import GraphModel
 from frongo.srv import GetInfo
 from frongo.srv import AddModel
-from frongo.srv import DetectAnnomalies
+from frongo.srv import DetectAnomalies
 
+
+
+def get_field(entry, field_name):
+    la=field_name.split('.')
+    val=entry
+    for i in la:
+        val=val[i]
+        
+    return val
 
 
 def load_yaml(filename):
@@ -69,7 +78,7 @@ class frongo(object):
         self.new_model_srv=rospy.Service('/frongo/add_model_defs', AddModel, self.add_model_cb)
         self.info_srv=rospy.Service('/frongo/get_models', GetInfo, self.get_model_info_cb)
         self.rebuild_srv=rospy.Service('/frongo/rebuild_all_models', Trigger, self.rebuild_all_models_cb)
-        self.detect_annomalies=rospy.Service('/frongo/detect_annomalies', DetectAnnomalies, self.detect_annomalies_cb)       
+        self.detect_annomalies=rospy.Service('/frongo/detect_anomalies', DetectAnomalies, self.detect_anomalies_cb)       
         
         #self.graph_model_construction()
         rospy.loginfo("All Done ...")
@@ -241,8 +250,74 @@ class frongo(object):
         for i in self.models:
             print "-------------------------------------"
             print i
-            self.set_model_states(i)
+            if i.model_type != 'events':
+                self.set_model_states(i)
+            else:
+                self.set_event_states(i)
 
+
+    def set_event_states(self, model):
+        db=self.mongo_client[model.db]
+        collection=db[model.collection]
+        query = json.loads(model.query)
+
+        #print "++++++++++++++++"
+        #print query
+        #print model.timestamp_field
+        
+        oldest = collection.find(query).sort(model.timestamp_field,1).limit(1)
+        youngest = collection.find(query).sort(model.timestamp_field, -1 ).limit(1)
+        
+        
+        oldest_t=get_field(oldest[0], model.timestamp_field) 
+        youngest_t= get_field(youngest[0], model.timestamp_field)
+        
+        if model.timestamp_type == 'datetime' :
+            oldest_t= int(oldest_t.strftime("%s"))
+            youngest_t= int(youngest_t.strftime("%s"))
+            
+        if model._dconf.has_key("sampling"):
+            sampling=model._dconf['sampling']
+        else:
+            sampling=7200
+        
+        
+        #print oldest_t, youngest_t, sampling
+        #print youngest_t-oldest_t,  (youngest_t-oldest_t)/sampling
+        #print "++++++++++++++++"
+        
+        #time0= oldest_t
+        available = collection.find(query).sort(model.timestamp_field,1)
+
+
+        model._add_state(oldest_t, 1.0)
+        last_inserted_time=oldest_t
+
+        epoch_events=[]        
+        
+        for i in available:
+            epoch=get_field(i, model.timestamp_field)
+            
+            if model.timestamp_type == 'datetime' :
+                epoch=int(epoch.strftime("%s"))
+            epoch_events.append(epoch)
+
+
+        n_epochs=0
+        last_inserted_time=last_inserted_time+sampling
+        while n_epochs < len(epoch_events):
+            if epoch_events[n_epochs] < last_inserted_time:
+                n_epochs+=1
+                model._add_state(last_inserted_time, 1.0)
+            else:
+                last_inserted_time=last_inserted_time+sampling
+                if epoch_events[n_epochs] < last_inserted_time:
+                    n_epochs+=1
+                    model._add_state(last_inserted_time, 1.0)
+                else:
+                    model._add_state(last_inserted_time, 0.0)
+
+        
 
     def set_model_states(self, model):
         db=self.mongo_client[model.db]
@@ -259,13 +334,13 @@ class frongo(object):
         self.graph_model_construction(req)
         return "Done"        
 
-    def detect_annomalies_cb(self, req):
+    def detect_anomalies_cb(self, req):
         model_found=False
         with self.srv_lock:
             for i in self.models:
                 if i.name == req.model_name:
                     print "Detecting annomalies over: "+str(req.confidence)+" for "+req.model_name
-                    epochs, values = i._detect_annomalies(req.confidence)
+                    epochs, values = i._detect_anomalies(req.order, req.confidence)
                     model_found=True
 
         if not model_found:
