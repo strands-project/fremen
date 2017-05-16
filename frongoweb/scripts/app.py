@@ -213,11 +213,12 @@ class Query:
         }
 
         dataset_anom = {
-            'label': 'Observations',
+            'label': 'Anomalies',
             'fill': False,
             'backgroundColor': "rgba(255,0,0,1)",
             'borderColor': "rgba(0,0,0,0)",
-            'markerType': "triangle",
+            'pointStyle': "square",
+            'radius': 6,
             'borderWidth': 0,
             'pointStrokeColor': "#fff",
             'pointHighlightFill': "#fff",
