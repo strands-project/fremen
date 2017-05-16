@@ -22,6 +22,7 @@ from frongo.srv import AddModel
 from frongo.srv import DetectAnnomalies
 
 
+
 def get_field(entry, field_name):
     la=field_name.split('.')
     val=entry
@@ -29,6 +30,7 @@ def get_field(entry, field_name):
         val=val[i]
         
     return val
+
 
 def load_yaml(filename):
     data=[]

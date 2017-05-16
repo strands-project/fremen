@@ -40,9 +40,9 @@ $var title: Frongo.
 						    <option value="2">2</option>
 						    <option value="3">3</option>
 						    <option value="4">4</option>
+						    <option value="5">5</option>
 						  </select>
 					</div>
-					
 
 				<div>
 						<div class="row clearfix">
@@ -78,6 +78,11 @@ $var title: Frongo.
 								    	</h3>
 								  	</div>
 								  	<div class="panel-body">
+												<div class="input-group">
+													<label for="anom_conf">Anomaly Confidence: </label><p/>
+													<input type="text" class="span2" value="1.0" data-slider-min="0" data-slider-max="1" data-slider-step=".05" data-slider-value="1" data-slider-orientation="horizontal" data-slider-selection="after" data-slider-tooltip="show" id="anom_conf">
+												</div>
+					
 									  		<canvas style="padding: 0;
 															margin: auto;
 															display: block;
@@ -166,17 +171,16 @@ $var title: Frongo.
 
 		function query() {
 			console.log("query");
-			console.log($$("#model").val());
+			console.log("anom=" + $$("#anom_conf").val());
 
 
 			$$.getJSON("/query", {
 					model: $$("#model").val(),
 					epoch_from: $$("#from").val(),
 					epoch_to: $$("#to").val(),
+					confidence: $$("#anom_conf").val(),
 					order: $$("#order").val(),
 				}, function (data) {
-		     	console.log(data)
-
 					display_predictions(data['prediction_chart']);
 					display_observations(data['observation_chart'],data['min'],data['max']);
 			    $$('#modelinfo').val(data['model_info']);
@@ -214,11 +218,25 @@ $var title: Frongo.
 
 		$$(document).ready(function () {
 
+			  $$("#anom_conf").slider({
+          formater: function(value) {
+            return 'Current value: '+value;
+          }
+        }).on('slideStop', function(ev){
+			  	query();
+			  });;
+
+
+
 				Chart.defaults.global.responsive = true;
 				if ("$data['def_model']" != "") {
 					$$("#model").html("$data['def_model']" + ' <span class="caret"></span>');
 					$$("#model").val("$data['def_model']");
 					$$("#order").val("$data['def_order']");
+					console.log("anom_conf = $data['anom_conf']");
+					$$("#anom_conf").val("$data['anom_conf']");
+					$$("#anom_conf").slider('setValue', "$data['anom_conf']")
+					//$$("#anom_conf").attr("data-slider-value", "$data['anom_conf']");
 				} else {
 					choose_model($$(".dropdown-menu li a:first"));
 				}

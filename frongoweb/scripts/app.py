@@ -19,6 +19,7 @@ from os import chdir
 from frongo.srv import PredictStateOrder
 from frongo.srv import PredictState
 from frongo.srv import GetInfo
+from frongo.srv import DetectAnnomalies
 
 
 
@@ -60,6 +61,7 @@ class Index:
           'def_to': user_data['to'] if 'to' in user_data else '',
           'def_order': user_data['order'] if 'order' in user_data else '0',
           'def_model': user_data['model'] if 'model' in user_data else '',
+          'anom_conf': user_data['anom_conf'] if 'anom_conf' in user_data else '1',
         }
         return renderer.index(data)
 
@@ -70,6 +72,7 @@ class FrongoBridge:
     entr_srv_name = '/frongo/get_entropies_with_order'
     info_srv_name = '/frongo/get_models'
     states_srv_name = '/frongo/get_states'
+    anomalies_srv_name = '/frongo/detect_annomalies'
 
     def __init__(self):
         rospy.loginfo('waiting for services')
@@ -77,6 +80,7 @@ class FrongoBridge:
         rospy.wait_for_service(self.info_srv_name)
         rospy.wait_for_service(self.entr_srv_name)
         rospy.wait_for_service(self.states_srv_name)
+        rospy.wait_for_service(self.anomalies_srv_name)
         self.pred_srv = rospy.ServiceProxy(self.pred_srv_name,
                                            PredictStateOrder)
         self.entr_srv = rospy.ServiceProxy(self.entr_srv_name,
@@ -85,6 +89,8 @@ class FrongoBridge:
                                            GetInfo)
         self.states_srv = rospy.ServiceProxy(self.states_srv_name,
                                              PredictState)
+        self.anomalies_srv = rospy.ServiceProxy(self.anomalies_srv_name,
+                                             DetectAnnomalies)
         rospy.loginfo('frongo services ready')
 
     def get_info(self):
@@ -105,6 +111,10 @@ class FrongoBridge:
         res = self.entr_srv(model, int(order), epochs)
         return res
 
+    def query_anomalies(self, model, confidence):
+        res = self.anomalies_srv(model, confidence)
+        return res
+
 
 class Query:
 
@@ -117,7 +127,7 @@ class Query:
     def epoch_to_dts(self, epoch):
         return datetime.fromtimestamp(epoch).strftime(DATETIME_PATTERN)
 
-    def query_frongo(self, model, order, epoch_from, epoch_to):
+    def query_frongo(self, model, order, confidence, epoch_from, epoch_to):
         duration = epoch_to - epoch_from
         steps_from_duration = int(duration / self.RESOLUTION)
         steps = max(steps_from_duration, self.MIN_STEP)
@@ -131,6 +141,7 @@ class Query:
         fentr = frongo.query_entropies(model, order, epochs)
         finfo = ''
         fstates = frongo.query_states(model, epoch_from, epoch_to)
+        fanomalies = frongo.query_anomalies(model, confidence)
 
         # we can use these fstates to eventually display the real observations
 
@@ -144,6 +155,8 @@ class Query:
             'states': fstates.predictions,
             'states_epochs': fstates.epochs,
             'entropies': fentr.predictions,
+            'anomalies_epochs': fanomalies.epochs,
+            'anomalies_values': fanomalies.values,
             'model_info': finfo
         }
         # res = {
@@ -185,11 +198,12 @@ class Query:
 
         return data
 
+
     def prepare_observation_plot(self, d):
         dataset_obs = {
             'label': 'Observations',
             'fill': False,
-            'backgroundColor': "rgba(220,0,220,0.3)",
+            'backgroundColor': "rgba(0,220,0,0.3)",
             'borderColor': "rgba(0,0,0,0)",
             'borderWidth': 0,
             'pointStrokeColor': "#fff",
@@ -198,13 +212,27 @@ class Query:
             'data': [{'x': p[1], 'y': p[0]} for p in zip(d['states'], d['states_epochs'])]
         }
 
-        print 'data:', dataset_obs['data']
+        dataset_anom = {
+            'label': 'Anomalies',
+            'fill': False,
+            'backgroundColor': "rgba(255,0,0,1)",
+            'borderColor': "rgba(0,0,0,0)",
+            'pointStyle': "square",
+            'radius': 6,
+            'borderWidth': 0,
+            'pointStrokeColor': "#fff",
+            'pointHighlightFill': "#fff",
+            'pointHighlightStroke': "rgba(220,220,220,1)",
+            'data': [{'x': p[1], 'y': p[0]} for p in zip(d['anomalies_values'], d['anomalies_epochs'])]
+        }
+
+        print 'data:', dataset_anom['data']
 
         data = {
             'type': 'line',
             'labels': [self.epoch_to_dts(s)
                        for s in d['states_epochs']],
-            'datasets': [dataset_obs],
+            'datasets': [dataset_obs, dataset_anom],
             'model_info': d['model_info']
         }
 
@@ -229,6 +257,7 @@ class Query:
 
         d = self.query_frongo(user_data['model'],
                               user_data['order'],
+                              float(user_data['confidence']),
                               epoch_from,
                               epoch_to)
 
@@ -238,7 +267,8 @@ class Query:
             'model':    user_data['model'],
             'order':    str(user_data['order']),
             'from':     self.epoch_to_dts(epoch_from),
-            'to':       self.epoch_to_dts(epoch_to)
+            'to':       self.epoch_to_dts(epoch_to),
+            'anom_conf':  user_data['confidence']
         }
 
         data = {
