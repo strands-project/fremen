@@ -66,12 +66,13 @@ class fremen_interface(object):
         return epochs_build, epochs_eval, states_build, states_eval
 
 
-    """
-     create_fremen_model
-     
-     This function creates the fremen model for each door
-    """
+
     def create_fremen_model(self, name, epochs, states, data_type='boolean', sampling_type='extrapolation'):
+        """
+         create_fremen_model
+         
+         This function creates the fremen model for model
+        """
         epochs_build, epochs_eval, states_build, states_eval = self.get_build_and_eval_states(epochs, states, sampling_type)
         if data_type=='boolean':
             order=self.add_and_eval_models(name, epochs_build, states_build, epochs_eval, states_eval)
@@ -80,13 +81,14 @@ class fremen_interface(object):
         return order
 
 
-    """
-     add_and_eval_models
-     
-     This function creates and evaluates fremen models for binary states
-     it returns the recommended order for the predictions
-    """
+
     def add_and_eval_models(self, model_id, a_epochs, a_states, e_epochs, e_states):
+        """
+         add_and_eval_models
+         
+         This function creates and evaluates fremen models for binary states
+         it returns the recommended order for the predictions
+        """
         fremgoal = fremenserver.msg.FremenGoal()
         fremgoal.operation = 'add'
         fremgoal.id = model_id
@@ -115,13 +117,14 @@ class fremen_interface(object):
         return pse.errors.index(min(pse.errors))
 
 
-    """
-     add_and_eval_value_models
-     
-     This function creates and evaluates fremen models for float values
-     it returns the recommended order for the predictions
-    """
+
     def add_and_eval_value_models(self, model_id, a_epochs, a_states, e_epochs, e_states):
+        """
+         add_and_eval_value_models
+         
+         This function creates and evaluates fremen models for float values
+         it returns the recommended order for the predictions
+        """
         #print a_states
         fremgoal = fremenserver.msg.FremenGoal()
         fremgoal.operation = 'addvalues'
@@ -229,12 +232,44 @@ class fremen_interface(object):
         return prob
 
 
-    """
-     monitor_cb
-     
-     This function monitors if fremenserver is still active
-    """
+    def detect_annomalies(self, model_id, epochs, states, order, confidence):
+        """
+         add_and_eval_value_models
+         
+         This function creates and evaluates fremen models for float values
+         it returns the recommended order for the predictions
+        """
+        #print a_states
+        fremgoal = fremenserver.msg.FremenGoal()
+        fremgoal.operation = 'detect'
+        fremgoal.id = model_id
+        fremgoal.times = epochs
+        print "Number of times provided "+str(len(fremgoal.times))
+        fremgoal.values = states
+        fremgoal.confidence = confidence
+        fremgoal.order = order
+        # Sends the goal to the action server.
+        self.FremenClient.send_goal(fremgoal)
+        #print "Sending data to fremenserver"
+        
+        
+        # Waits for the server to finish performing the action.
+        self.FremenClient.wait_for_result()
+        ps = self.FremenClient.get_result()
+        
+        print "Detect"
+        print ps
+        print "Fin detect"
+        return ps.anomalyTimes, ps.anomalyValues
+        
+
+
     def monitor_cb(self, events) :
+        """
+         monitor_cb
+         
+         This function monitors if fremenserver is still active
+        """
         if not self.FremenClient.wait_for_server(timeout = rospy.Duration(1)):
             rospy.logerr("NO FREMEN SERVER FOUND. Fremenserver restart might be required")
 

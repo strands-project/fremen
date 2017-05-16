@@ -41,6 +41,11 @@ class CFrelementSet
 		  otherwise returns the best performing model order and the errors in the eval array*/
 		int evaluate(const char *name,uint32_t times[],unsigned char probs[],int length,int order,float eval[]);
 
+		/*detects anomalies in the data given provided
+		  returns -1 if the state with the given ID is not present in the collection
+		  otherwise returns the observation probabilities in the probs array and the detected anomalies in the anomTimes and anomVals arrays*/
+		int detect(const char *name,uint32_t times[],float probs[],int length,int order,float confidence,uint32_t anomTimes[],float anomVals[]);
+
 		/*remove states from the collection
 		  return the number of remaining states*/
 		int remove(const char *name);
