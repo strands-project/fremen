@@ -22,6 +22,13 @@ from frongo.srv import AddModel
 from frongo.srv import DetectAnnomalies
 
 
+def get_field(entry, field_name):
+    la=field_name.split('.')
+    val=entry
+    for i in la:
+        val=val[i]
+        
+    return val
 
 def load_yaml(filename):
     data=[]
@@ -241,8 +248,63 @@ class frongo(object):
         for i in self.models:
             print "-------------------------------------"
             print i
-            self.set_model_states(i)
+            if i.model_type != 'events':
+                self.set_model_states(i)
+            else:
+                print "events model type no model states added yet"
+                self.set_event_states(i)
 
+
+    def set_event_states(self, model):
+        db=self.mongo_client[model.db]
+        collection=db[model.collection]
+        query = json.loads(model.query)
+
+        print "++++++++++++++++"
+        print query
+        print model.timestamp_field
+        
+        oldest = collection.find(query).sort(model.timestamp_field,1).limit(1)
+        youngest = collection.find(query).sort(model.timestamp_field, -1 ).limit(1)
+        
+        
+        oldest_t=get_field(oldest[0], model.timestamp_field) 
+        youngest_t= get_field(youngest[0], model.timestamp_field)
+        
+        if model.timestamp_type == 'datetime' :
+            oldest_t= int(oldest_t.strftime("%s"))
+            youngest_t= int(youngest_t.strftime("%s"))
+            
+        if model._dconf.has_key("sampling"):
+            sampling=model._dconf['sampling']
+        else:
+            sampling=7200
+        
+        
+        print oldest_t, youngest_t, sampling
+        print youngest_t-oldest_t,  (youngest_t-oldest_t)/sampling
+        print "++++++++++++++++"
+        
+        #time0= oldest_t
+        available = collection.find(query).sort(model.timestamp_field,1)
+
+
+        model._add_state(oldest_t, 1.0)
+        last_inserted_time=oldest_t
+        
+        for i in available:
+            epoch=get_field(i, model.timestamp_field)
+            if model.timestamp_type == 'datetime' :
+                epoch=int(epoch.strftime("%s"))
+                
+            while epoch > last_inserted_time:
+                last_inserted_time = last_inserted_time + sampling
+                if epoch > last_inserted_time:
+                    model._add_state(last_inserted_time, 0.0)
+                else:
+                    model._add_state(last_inserted_time, 1.0)
+        
+        print model.states
 
     def set_model_states(self, model):
         db=self.mongo_client[model.db]
