@@ -8,6 +8,7 @@ import roslib
 import web
 import signal
 from json import dumps
+from yaml import load
 from datetime import datetime
 from time import mktime, strptime, time
 from bson import json_util
@@ -271,13 +272,15 @@ class Query:
             'anom_conf':  user_data['confidence']
         }
 
+        model_info = load(prediction_chart['model_info'])
         data = {
             'prediction_chart':     prediction_chart,
             'observation_chart':    observation_chart,
             'url':                  '/?' + urlencode(query_params),
             'min':                  epoch_from,
             'max':                  epoch_to,
-            'model_info':			prediction_chart['model_info']
+            'model_info':			prediction_chart['model_info'],
+            'best_order': model_info['order']
         }
 
         data['url'] = '/?' + urlencode(query_params)
