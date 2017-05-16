@@ -141,9 +141,9 @@ class TModels(object):
         else:
             self.order = 0
 
-    def _detect_annomalies(self, confidence):
+    def _detect_anomalies(self, order, confidence):
         if not self.unknown:
-            self.anomalyTimes, self.anomalyValues = self._fremen.detect_annomalies(self.name, self.epochs, self.states, self.order, confidence)
+            self.anomalyTimes, self.anomalyValues = self._fremen.detect_anomalies(self.name, self.epochs, self.states, order, confidence)
         return self.anomalyTimes, self.anomalyValues
         
 

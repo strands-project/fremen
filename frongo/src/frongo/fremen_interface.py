@@ -232,7 +232,7 @@ class fremen_interface(object):
         return prob
 
 
-    def detect_annomalies(self, model_id, epochs, states, order, confidence):
+    def detect_anomalies(self, model_id, epochs, states, order, confidence):
         """
          add_and_eval_value_models
          

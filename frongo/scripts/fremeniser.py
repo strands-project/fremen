@@ -19,7 +19,7 @@ from frongo.srv import PredictStateOrder
 from frongo.srv import GraphModel
 from frongo.srv import GetInfo
 from frongo.srv import AddModel
-from frongo.srv import DetectAnnomalies
+from frongo.srv import DetectAnomalies
 
 
 
@@ -78,7 +78,7 @@ class frongo(object):
         self.new_model_srv=rospy.Service('/frongo/add_model_defs', AddModel, self.add_model_cb)
         self.info_srv=rospy.Service('/frongo/get_models', GetInfo, self.get_model_info_cb)
         self.rebuild_srv=rospy.Service('/frongo/rebuild_all_models', Trigger, self.rebuild_all_models_cb)
-        self.detect_annomalies=rospy.Service('/frongo/detect_annomalies', DetectAnnomalies, self.detect_annomalies_cb)       
+        self.detect_annomalies=rospy.Service('/frongo/detect_anomalies', DetectAnomalies, self.detect_anomalies_cb)       
         
         #self.graph_model_construction()
         rospy.loginfo("All Done ...")
@@ -334,13 +334,13 @@ class frongo(object):
         self.graph_model_construction(req)
         return "Done"        
 
-    def detect_annomalies_cb(self, req):
+    def detect_anomalies_cb(self, req):
         model_found=False
         with self.srv_lock:
             for i in self.models:
                 if i.name == req.model_name:
                     print "Detecting annomalies over: "+str(req.confidence)+" for "+req.model_name
-                    epochs, values = i._detect_annomalies(req.confidence)
+                    epochs, values = i._detect_anomalies(req.order, req.confidence)
                     model_found=True
 
         if not model_found:
