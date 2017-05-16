@@ -12,10 +12,11 @@ def get_field(item, key):
 
 class TModels(object):
 
-    def __init__(self, name, data_field='data', data_type='boolean', data_conf='', 
-                 timestamp_field='_meta.inserted_at', timestamp_type='datetime',
-                 query='{}', db='message_store', collection='message_store'):
+    def __init__(self, name, data_field='data', model_type='standard', 
+                 data_type='boolean', data_conf='', timestamp_field='_meta.inserted_at',
+                 timestamp_type='datetime', query='{}', db='message_store', collection='message_store'):
         self.name=name
+        self.model_type=model_type
         self.db=db
         self.collection=collection
         self.query=query
@@ -46,11 +47,18 @@ class TModels(object):
 
         self._set_data_configuration()
 
+
     def _set_data_configuration(self):
         if self.data_conf != '':
             self._dconf=json.loads(self.data_conf)
         else:
             self._dconf=self.data_conf
+
+    def _add_state(self, epoch, state):
+        self.unknown=False
+        self.states.append(state)
+        self.epochs.append(epoch)
+        
 
     def _add_entry(self, entry):
         self.unknown=False
@@ -133,9 +141,9 @@ class TModels(object):
         else:
             self.order = 0
 
-    def _detect_annomalies(self, confidence):
+    def _detect_anomalies(self, order, confidence):
         if not self.unknown:
-            self.anomalyTimes, self.anomalyValues = self._fremen.detect_annomalies(self.name, self.epochs, self.states, self.order, confidence)
+            self.anomalyTimes, self.anomalyValues = self._fremen.detect_anomalies(self.name, self.epochs, self.states, order, confidence)
         return self.anomalyTimes, self.anomalyValues
         
 

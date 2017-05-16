@@ -162,3 +162,31 @@ YES, this is so awesome you can also get the model entropy over time using the s
     uint32[] epochs
     float64[] predictions
     ```
+### Describe Frongoweb
+
+here I will describe frongo web
+    
+### Examples
+
+```Yaml
+- model:
+    name: "mon_navs_tsc_y3"
+    model_type: "events"
+    db: "tsc_y4_message_store"
+    collection: "filtered_monitored_nav_events_y3"
+    query: "{}"
+    timestamp_field: "_meta.inserted_at"
+    timestamp_type: 'datetime'
+    data_type: "float"
+    data_conf: '{"sampling": 1800}'
+- model:
+    name: "mon_navs_tsc_y4"
+    model_type: "events"
+    db: "tsc_y4_message_store"
+    collection: "filtered_monitored_nav_events"
+    query: "{}"
+    timestamp_field: "_meta.inserted_at"
+    timestamp_type: 'datetime'
+    data_type: "float"
+    data_conf: '{"sampling": 1800}'
+```
