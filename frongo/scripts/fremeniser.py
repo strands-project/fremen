@@ -251,7 +251,6 @@ class frongo(object):
             if i.model_type != 'events':
                 self.set_model_states(i)
             else:
-                print "events model type no model states added yet"
                 self.set_event_states(i)
 
 
@@ -260,9 +259,9 @@ class frongo(object):
         collection=db[model.collection]
         query = json.loads(model.query)
 
-        print "++++++++++++++++"
-        print query
-        print model.timestamp_field
+        #print "++++++++++++++++"
+        #print query
+        #print model.timestamp_field
         
         oldest = collection.find(query).sort(model.timestamp_field,1).limit(1)
         youngest = collection.find(query).sort(model.timestamp_field, -1 ).limit(1)
@@ -281,9 +280,9 @@ class frongo(object):
             sampling=7200
         
         
-        print oldest_t, youngest_t, sampling
-        print youngest_t-oldest_t,  (youngest_t-oldest_t)/sampling
-        print "++++++++++++++++"
+        #print oldest_t, youngest_t, sampling
+        #print youngest_t-oldest_t,  (youngest_t-oldest_t)/sampling
+        #print "++++++++++++++++"
         
         #time0= oldest_t
         available = collection.find(query).sort(model.timestamp_field,1)
@@ -291,20 +290,32 @@ class frongo(object):
 
         model._add_state(oldest_t, 1.0)
         last_inserted_time=oldest_t
+
+        epoch_events=[]        
         
         for i in available:
             epoch=get_field(i, model.timestamp_field)
+            
             if model.timestamp_type == 'datetime' :
                 epoch=int(epoch.strftime("%s"))
-                
-            while epoch > last_inserted_time:
-                last_inserted_time = last_inserted_time + sampling
-                if epoch > last_inserted_time:
-                    model._add_state(last_inserted_time, 0.0)
-                else:
+            epoch_events.append(epoch)
+
+
+        n_epochs=0
+        last_inserted_time=last_inserted_time+sampling
+        while n_epochs < len(epoch_events):
+            if epoch_events[n_epochs] < last_inserted_time:
+                n_epochs+=1
+                model._add_state(last_inserted_time, 1.0)
+            else:
+                last_inserted_time=last_inserted_time+sampling
+                if epoch_events[n_epochs] < last_inserted_time:
+                    n_epochs+=1
                     model._add_state(last_inserted_time, 1.0)
+                else:
+                    model._add_state(last_inserted_time, 0.0)
+
         
-        print model.states
 
     def set_model_states(self, model):
         db=self.mongo_client[model.db]
