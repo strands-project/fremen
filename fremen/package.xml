@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package>
+  <name>fremen</name>
+  <version>0.2.1</version>
+  <description>Fremen is a tool for prediction of binary states based on non-uniform Fourier Transform. It uses the frequency spectrum analysis to identify reoccuring patterns in temporal sequences of binary states and represents the probability of these states in an analythical form as a combination of harmonic functions. This allows to learn long-term dynamics of the environment and use the learned experience to predict states of the world models used in mobile robotics. This ability is beneficial for tasks like self-localization, object search, path planning, anomaly detection and exploration.</description>
+
+  <maintainer email="tkrajnik@lincoln.ac.uk">Tom Krajnik</maintainer>
+  <license>MIT</license>
+  <author email="tkrajnik@lincoln.ac.uk">Tom Krajnik</author>
+
+  <run_depend>Fremen2DGrid</run_depend>
+  <run_depend>FremenArray</run_depend>
+  <run_depend>FremenServer</run_depend>
+  <run_depend>fremengrid</run_depend>
+  <run_depend>frenap</run_depend>
+  <run_depend>froctomap</run_depend>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+
+  <!-- The export tag contains other, unspecified, tags -->
+  <export>
+    <!-- Other tools can request additional information be placed here -->
+    <metapackage/>
+
+  </export>
+</package>
