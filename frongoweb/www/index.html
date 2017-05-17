@@ -33,7 +33,7 @@ $var title: Frongo.
 						<input type="text" class="form-control form_datetime" id="to" placeholder="To" aria-describedby="to"  value="$data['def_to']"/>
 					</div>
 					<div class="input-group">
-						  <label for="order">Select Order</label>
+						  <label for="order">Select Order (Best order: <span id="best_order"></span>)</label>
 						  <select class="form-control" id="order">
 						    <option value="0">0</option>
 						    <option value="1">1</option>
@@ -184,6 +184,8 @@ $var title: Frongo.
 					display_predictions(data['prediction_chart']);
 					display_observations(data['observation_chart'],data['min'],data['max']);
 			    $$('#modelinfo').val(data['model_info']);
+			    $$('#best_order').html(data['best_order']);
+			    console.log(data['best_order']);
 			    $$('#queryurl').attr('href', data['url']);
 			  }
 			);

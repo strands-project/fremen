@@ -8,6 +8,7 @@ import roslib
 import web
 import signal
 from json import dumps
+from yaml import load
 from datetime import datetime
 from time import mktime, strptime, time
 from bson import json_util
@@ -19,7 +20,7 @@ from os import chdir
 from frongo.srv import PredictStateOrder
 from frongo.srv import PredictState
 from frongo.srv import GetInfo
-from frongo.srv import DetectAnnomalies
+from frongo.srv import DetectAnomalies
 
 
 
@@ -72,7 +73,7 @@ class FrongoBridge:
     entr_srv_name = '/frongo/get_entropies_with_order'
     info_srv_name = '/frongo/get_models'
     states_srv_name = '/frongo/get_states'
-    anomalies_srv_name = '/frongo/detect_annomalies'
+    anomalies_srv_name = '/frongo/detect_anomalies'
 
     def __init__(self):
         rospy.loginfo('waiting for services')
@@ -90,7 +91,7 @@ class FrongoBridge:
         self.states_srv = rospy.ServiceProxy(self.states_srv_name,
                                              PredictState)
         self.anomalies_srv = rospy.ServiceProxy(self.anomalies_srv_name,
-                                             DetectAnnomalies)
+                                                DetectAnomalies)
         rospy.loginfo('frongo services ready')
 
     def get_info(self):
@@ -111,8 +112,8 @@ class FrongoBridge:
         res = self.entr_srv(model, int(order), epochs)
         return res
 
-    def query_anomalies(self, model, confidence):
-        res = self.anomalies_srv(model, confidence)
+    def query_anomalies(self, model, order, confidence):
+        res = self.anomalies_srv(model, int(order), confidence)
         return res
 
 
@@ -141,7 +142,7 @@ class Query:
         fentr = frongo.query_entropies(model, order, epochs)
         finfo = ''
         fstates = frongo.query_states(model, epoch_from, epoch_to)
-        fanomalies = frongo.query_anomalies(model, confidence)
+        fanomalies = frongo.query_anomalies(model, order, confidence)
 
         # we can use these fstates to eventually display the real observations
 
@@ -271,13 +272,15 @@ class Query:
             'anom_conf':  user_data['confidence']
         }
 
+        model_info = load(prediction_chart['model_info'])
         data = {
             'prediction_chart':     prediction_chart,
             'observation_chart':    observation_chart,
             'url':                  '/?' + urlencode(query_params),
             'min':                  epoch_from,
             'max':                  epoch_to,
-            'model_info':			prediction_chart['model_info']
+            'model_info':			prediction_chart['model_info'],
+            'best_order': model_info['order']
         }
 
         data['url'] = '/?' + urlencode(query_params)
