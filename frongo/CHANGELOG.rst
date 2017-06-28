@@ -2,8 +2,8 @@
 Changelog for package frongo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.1 (2017-06-28)
+------------------
 * Event modelling (`#45 <https://github.com/strands-project/fremen/issues/45>`_)
   * fingers crossed this is a hail mary
   * fixing stupid error

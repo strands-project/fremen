@@ -2,8 +2,8 @@
 Changelog for package frongoweb
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.1 (2017-06-28)
+------------------
 * small improvement to show the best model on frongoweb (`#44 <https://github.com/strands-project/fremen/issues/44>`_)
   * fingers crossed this is a hail mary
   * fixing stupid error

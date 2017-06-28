@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>froctomap</name>
-  <version>0.3.0</version>
+  <version>0.3.1</version>
   <description>
   The FrOctoMap (Frequency Enhanced OctoMap) method allows for efficient volumetric representation of dynamic three-dimensional environments over long periods of time.
   It is based on combination of a well-established 3D mapping framework called Octomaps and an idea to model environment dynamics by its frequency spectrum (FreMeN) [3].

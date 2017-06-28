@@ -2,8 +2,8 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.1 (2017-06-28)
+------------------
 * Frongo Web Improvements for Anomalies and Anomalies fixed in frongo (`#43 <https://github.com/strands-project/fremen/issues/43>`_)
   * fingers crossed this is a hail mary (was `#42 <https://github.com/strands-project/fremen/issues/42>`_)
   * fixing stupid error
