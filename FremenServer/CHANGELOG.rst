@@ -2,6 +2,16 @@
 Changelog for package frenap
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Frongo Web Improvements for Anomalies and Anomalies fixed in frongo (`#43 <https://github.com/strands-project/fremen/issues/43>`_)
+  * fingers crossed this is a hail mary (was `#42 <https://github.com/strands-project/fremen/issues/42>`_)
+  * fixing stupid error
+  * handling empty lists
+  * first version with anomalies
+  * ok, kind of working now
+* Contributors: Marc Hanheide
+
 0.3.0 (2016-11-03)
 ------------------
 

@@ -2,6 +2,26 @@
 Changelog for package frongo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Event modelling (`#45 <https://github.com/strands-project/fremen/issues/45>`_)
+  * fingers crossed this is a hail mary
+  * fixing stupid error
+  * handling empty lists
+  * Adding event modelling to frongo
+  * Update README.md
+  adding todos to readme
+  * removing prints
+  * adding order to anomaly detection and fixing spelling
+* Frongo Web Improvements for Anomalies and Anomalies fixed in frongo (`#43 <https://github.com/strands-project/fremen/issues/43>`_)
+  * fingers crossed this is a hail mary (was `#42 <https://github.com/strands-project/fremen/issues/42>`_)
+  * fixing stupid error
+  * handling empty lists
+  * first version with anomalies
+  * ok, kind of working now
+* Now Frongo manages models with empty queries and adding `/rebuild_all_models` service. (`#38 <https://github.com/strands-project/fremen/issues/38>`_)
+* Contributors: Jaime Pulido Fentanes, Marc Hanheide
+
 0.3.0 (2016-11-03)
 ------------------
 
