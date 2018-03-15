@@ -4,7 +4,7 @@ project(froctomap)
 
 find_package(catkin REQUIRED COMPONENTS  pcl_conversions pcl_ros roscpp rospy std_msgs visualization_msgs geometry_msgs genmsg octomap_server sensor_msgs)
 #set ( CMAKE_CXX_FLAGS "-O3 -march=native")
-set ( CMAKE_CXX_FLAGS "-ggdb")
+set ( CMAKE_CXX_FLAGS "-ggdb -D_FILE_OFFSET_BITS=64" )
 
 
 
@@ -39,6 +39,7 @@ catkin_package()
 add_executable(froctomap src/froctomap.cpp)
 add_executable(convert_raw src/convert_raw.cpp)
 add_executable(froctomap_util src/froctomap_util.cpp)
+add_executable(froctodump_show src/froctodump_show.cpp)
 
 add_dependencies(froctomap ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_generate_messages_cpp)
 
@@ -55,6 +56,7 @@ target_link_libraries(froctomap froctomap_grid)
 target_link_libraries(froctomap_util froctomap_grid)
 target_link_libraries(convert_raw ${catkin_LIBRARIES})
 target_link_libraries(froctomap ${catkin_LIBRARIES})
+target_link_libraries(froctodump_show ${catkin_LIBRARIES})
 
 #############
 ## Install ##

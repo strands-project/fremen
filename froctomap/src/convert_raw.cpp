@@ -94,8 +94,8 @@ int main(int argc, char** argv)
 			  depth_image.data[2*i+1] = (buffer[i])/256;
 		  }
 
-		  //ros::Time test(data_timestamp/1000000,data_timestamp%1000000);
-		  ros::Time test = ros::Time::now();
+		  ros::Time test(data_timestamp/1000000,data_timestamp%1000000);
+		  //ros::Time test = ros::Time::now();
 		  depth_image.header.stamp = test; //ros::Time(,):
 		  camera_info.header.stamp = test;
 
